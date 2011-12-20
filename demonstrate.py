@@ -91,7 +91,7 @@ map( w.writerow,
                         ),
                         ## making a (sub) total on the fly
                         'total_coolness_and_voters' : array( [ 
-                            int( document[COOLNESS], 1 ) 
+                            int( document[COOLNESS]), 1  
                         ] ) 
                     }
                 ),
