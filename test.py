@@ -3,30 +3,32 @@
 
 from accu_dict import AccuDict, can_be_walked
 
-from copy import deepcopy 
+from copy import deepcopy
 
-def try_copy_or_copy(self, src, dst ):
+
+def try_copy_or_copy(self, src, dst):
     copy = None
-    if hasattr( src, "copy"):
+    if hasattr(src, "copy"):
         copy = src.copy()
     else:
         copy = deepcopy(src)
-    setattr( self, dst,  copy )
+    setattr(self, dst, copy)
 
 
-class consistent_addition:
+class consistent_addition(object):
     """test wether an addition for two object is consistant"""
+
     def __init__(self, **kw):
-        self.counter = 1 
+        self.counter = 1
         self.neutral = None
         self.one = None
         self.other = None
         self._neutral = kw["neutral"]
         self._one = kw["one"]
         self._other = self._other = kw["other"]
-        self.equal = kw.get( "equal" , None ) 
-        self.scalar = kw.get( "scalar" , 3 )
-        self.collect_values = kw.get("collect_values" , lambda x : x)
+        self.equal = kw.get("equal", None)
+        self.scalar = kw.get("scalar", 3)
+        self.collect_values = kw.get("collect_values", lambda x: x)
         print "\n"  + "*" * 50
         print "\ntesting for  %r class\n" % ( self._one.__class__.__name__  )
         print " a = %r" % self._one
