@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #WTFPL
 
-from accu_dict import AccuDict
+from accu_dict import AccuDict, can_be_walked
 
 from copy import deepcopy 
 
@@ -17,7 +17,7 @@ def try_copy_or_copy(self, src, dst ):
 class consistent_addition:
     """test wether an addition for two object is consistant"""
     def __init__(self, **kw):
-
+        self.counter = 1 
         self.neutral = None
         self.one = None
         self.other = None
@@ -25,18 +25,33 @@ class consistent_addition:
         self._one = kw["one"]
         self._other = self._other = kw["other"]
         self.equal = kw.get( "equal" , None ) 
-        print "testing for  %r class %r" % ( self._one.__class__.__name__  , kw )
+        self.scalar = kw.get( "scalar" , 3 )
+        self.collect_values = kw.get("collect_values" , lambda x : x)
+        print "\n"  + "*" * 50
+        print "\ntesting for  %r class\n" % ( self._one.__class__.__name__  )
+        print " a = %r" % self._one
+        print " b = %r" % self._other
+        print " an_int = %r " % self.scalar
+        print " neutral element for addition is %r " % self._neutral
+        print "\n"  + "*" * 50
+
         self.LesserCommutativity()
-        print "******"
+        if hasattr( self.one, '__rmul__' ): 
+            self.BetterCommutativity()
+        
+        
+        if can_be_walked( self.one ):
+            self.Conservation()
+        print "\n"  + "*" * 50
     
-    def fixture(method):
+    def fixture_and_test(method):
         def reinit_me(self, *a, **kw ):
             to_reinit =  dict( _one = "one", _other = "other" , _neutral = "neutral" )
             for src, dst in to_reinit.items():
                 obj_src = getattr( self, src )
                 try_copy_or_copy(self, obj_src, dst )
 
-            res = "Arg" 
+            res = "Arg : " 
             try:
                 ( left, right ) = method( self, *a , **kw )
                 if self.equal:
@@ -46,48 +61,97 @@ class consistent_addition:
                 res = is_equal and "ok" or "ko" 
             except Exception as e:
                 res += "%r" % e 
+            print "\ntest #%d" % self.counter
+            print method.__doc__
             print "%s is %s" % (method.__name__ , res ) 
+            self.counter += 1 
+            if "ko" == res:
+                print "%r != %r " % ( left, right ) 
         return reinit_me 
 
 
 
-    @fixture
+    @fixture_and_test
     def test_commutativity( self ):
+        """ a + b = b + a """
         return ( self.other + self.one ,  self.one + self.other )
    
-    @fixture
+    @fixture_and_test
     def test_neutral( self ):
+        """ a + neutral = a """
         return ( self.neutral + self.one , self.one )
 
 
-    @fixture
+    @fixture_and_test
     def test_mul_scal(self ):
-        return 2 * self.one, self.one + self.one
+        """ an_int * a = a + ... + a (n times ) """
+        left = self.scalar * self.one
+        right = self.one
+        for i in xrange( self.scalar -1 ):
+            right = right + self.one
+        return ( left, right)
     
-    @fixture
-    def test_neutral_mul_scal( self ):
-        return self.scal_neutr * self.one, self.one 
 
-    @fixture
+    @fixture_and_test
+    def test_neutral_mul_scal( self ):
+        """ 1 * a = a """
+        return 1 * self.one, self.one 
+   
+    @fixture_and_test
+    def test_div_consisentcy( self ):
+        """ a * n  / 2  = a + ... + a n /2 times (n beign odd)"""
+        right = ( self.one * ( self.scalar * 2 ) ) / 2
+        left = self.other
+        for i in xrange( self.scalar - 1 ):
+            left = left + self.other
+        return left, right
+    
+    @fixture_and_test
+    def test_fraction_consisentcy( self ):
+        """ a  / 2  = .5 * a"""
+        ### not implemented because of the float equality shit
+        return  self.one / 2, .5 * self.one
+
+    @fixture_and_test
+    def test_mul_scal_commut( self ):
+        """ an_int * a = a * an_int """
+        return self.scalar * self.one, self.one * self.scalar
+
+    @fixture_and_test
     def test_neg(self):
+        """ -a = -1 * a """
         return -1 * self.one , self.one.__neg__() 
 
-    @fixture
-    def test_neg_and_mul(self ):
-        return self.one - self.other , self.one + ( - 1 * self.other )
+    @fixture_and_test
+    def test_sub(self):
+        """ a - b = a + ( -1 * b) """
+        return self.one - self.other , self.one + ( -1 * self.other )
 
-    @fixture
+    @fixture_and_test
     def test_scal_lin_combo(self):
+        """ an_int ( a + b) = an_int *a + an_int * b """
         return ( 
             self.scalar * ( self.one + self.other ) , 
             self.scalar * self.one + self.scalar * self.other
         )
     
-    @fixture
-    def conservation(cls):
-        return sum( cls.one.values() + cls.other.values() ), sum( cls.one.values() + cls.other.values() )
-
         
+    @fixture_and_test
+    def conservation(self):
+        """sum of the parts = sum of the total"""
+        return (  
+            sum( self.collect_values( self.one + self.other) ), 
+            sum( self.collect_values( self.one ) ) + sum( self.collect_values ( self.other ) )
+       )
+
+    @fixture_and_test
+    def conservation_neg(self):
+        """sum of the differences == differences of the sum"""
+        return (  
+            sum( self.collect_values( self.one - self.other) ), 
+            sum( self.collect_values( self.one ) ) - sum( self.collect_values ( self.other ) )
+       )
+
         
     def LesserCommutativity(self ):
         self.test_commutativity()
@@ -96,14 +160,17 @@ class consistent_addition:
     
 
     def BetterCommutativity( self ):
-        if not getattr(self, scal_neutr ):
-            print "No way I can test"
-        else:
-            self.test_neutral_mul_scal()
-            self.test_mul_scal()
-            self.test_neg()
-            self.test_sub()
-            
+        self.test_neutral_mul_scal()
+        self.test_mul_scal()
+        self.test_mul_scal_commut()
+        self.test_neg()
+        self.test_sub()
+        self.test_scal_lin_combo()
+
+    def Conservation(self):
+        self.conservation()
+        self.conservation_neg()
+        
 
 from numpy import array as array
 
@@ -111,13 +178,18 @@ consistent_addition(
     neutral = array( [ 0, 0, 0 ])  ,
     one = array( [ 1 , 2 , 3 ] ) , 
     other = array( [ 3 , 4 , -1 ] ), 
-    equal = lambda left, right : (right == left).all() 
+    equal = lambda left, right : (right == left).all() ,
     )
 
 consistent_addition( 
     neutral = 0 , 
     one = 1 , 
     other = 2 )
+
+consistent_addition( 
+    neutral = [ ] , 
+    one = [ 1 ] , 
+    other = [ 2 ] )
 
 consistent_addition( 
     neutral = "", 
@@ -128,10 +200,10 @@ CA = consistent_addition(
     neutral = AccuDict( int, { } ) , 
     one = AccuDict( int, { "one" : 1 , "one_and_two" : 3 } ),
     other = AccuDict( int, { "one_and_two" : -1, "two":2 } ),
+    collect_values = lambda x : x.values()
     )
-CA.conservation()
 
 one = AccuDict( int, { "one" : 1 , "one_and_two" : 12 } )
 other = AccuDict( int, { "one_and_two" : -9, "two":2 } )
 
-print "%r" % (  one + other )
+print "just for fun %r + %r = %r" % (one,other,   one + other )
