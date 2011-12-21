@@ -23,6 +23,8 @@ bob,US,serious,php,1
 isabelle,FR,fun,perl,10
 Kallista,FR,unfun,c#,-10
 Nellev,FR,typorigid,python,1
+haypo,FR,javabien,python,1
+potrou,FR,globally locked,python,1 
 petra,DE,sexy,VHDL,69"""
 
 nosql_iterator = reader
