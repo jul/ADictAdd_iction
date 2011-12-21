@@ -5,7 +5,7 @@ from collections import Sequence, Mapping
 #WTFPL
 """Overriding collections.DefaultDict to support addition """
 
-all = [ 'AccuDict', 'objwalk' , 'flattening' ]
+all = [ 'AccuDict', 'objwalk' , 'flattening', 'can_be_walked' ]
 ##mouais le test sur list ou tuple quand on a du numpy.array ça sux
 ## puis si on peut le parcourir ça quake "__iter__"
 
@@ -30,8 +30,8 @@ def objwalk(obj, path=(), limit = False ):
     # source http://tech.blog.aknin.name/2011/12/11/walking-python-objects-recursively/
     """
     if isinstance(obj, Mapping):
-        iterizer = hasattr( obj  , "iteritems" ) and obj.iteritems() or obj
-        for key, value in iterizer:
+        
+        for key, value in obj.iteritems():
             for child in objwalk(value, path + (key,)):
                 yield child
     elif isinstance(obj, Sequence) and not isinstance(obj, basestring):
@@ -39,7 +39,7 @@ def objwalk(obj, path=(), limit = False ):
             for child in objwalk(value, path + (index,)):
                 yield child
     else:
-        yield [ x for x in flattening( ( path , obj ) )  ]
+        yield [ x for x in flattening( ( path ,  obj  ) )  ]
 
 
 
@@ -50,7 +50,66 @@ class AccuDict(defaultdict):
         """constructor"""
         defaultdict.__init__(self, *a, **kw )
 
-    
+    def __mul__(left1, left2, *a , **lw):
+        """muler"""
+        if isinstance( left2 , ( float, int, complex ) ):
+            return left1.__rmul__( left2 )
+        if isinstance( left1 , ( float, int, complex ) ):
+            return left2.__rmul__( left1 )
+        else:
+            raise Exception("to be soon implemented")
+
+
+    def __neg__(self):
+        for k, v in self.iteritems():
+            self[k] = -1 * v
+        return self
+        
+    def __imul__( integer, self ):
+        #print "%r //%r" %  ( self, integer ) 
+        print "imul called"
+        another = self.copy()
+        #print "%r * %r " % ( integer, another ) 
+        for k, v in self.iteritems():
+            another[k] = integer * v
+        return another
+        
+    def __sub__(self, other ):
+        """subber"""
+        positive = self.copy()
+        negative = other
+        neg_key = set( negative.keys() )
+        pos_key = set( positive.keys() )
+        for k, v in negative.iteritems():
+            if k in positive.keys():
+                positive[k] -= v 
+            else:
+                positive[k] = -v
+        return positive
+
+    def __rmul__(self, scalar ):
+        #print "%r //%r" %  ( self, integer ) 
+        another = self.copy()
+        if not isinstance( scalar, ( float, complex, int ) ):
+            raise Exception("Unhandled rmul type for %r " % scalar )
+        #print "%r * %r " % ( integer, another ) 
+        for k, v in self.iteritems():
+            another[k] = scalar * v
+        return another
+        
+    def __sub__(self, other ):
+        """subber"""
+        positive = self.copy()
+        negative = other
+        neg_key = set( negative.keys() )
+        pos_key = set( positive.keys() )
+        for k, v in negative.iteritems():
+            if k in positive.keys():
+                positive[k] -= v 
+            else:
+                positive[k] = -v
+        return positive
+   
     def __add__(left1, left2 ):
         """adder"""
         left1_big = len( left1.keys() )  > len( left2.keys() ) 
@@ -78,8 +137,31 @@ class AccuDict(defaultdict):
         #print "self %r" % self
 
 if '__main__' == __name__ :
+    print "undestranding 2 * array"
+    from numpy import array, ndarray
+   # def tracing( callme):
+   #     def wrapper( callme):
+   #         call_my_name = callme.__name__ or "oops"
+   #         call_arg = "%r / %r" % ( a , kw )
+   #         print "IN : %r( %r )" % ( call_my_name, call_arg )
+   #         try:
+   #             res = callme( *a , **kw )
+   #         except Exception as e :
+   #             print "OUT: E  %r" %  e
+   #         print "OUT : %r => %r" % ( callme, res)
+   #         return result
+   #     return wrapper
+   # for method in AccuDict.__dict__.keys():
+   #     if method.startswith("__"):
+   #         print "%r " % ( method, ) 
+   #         setattr( int , method, tracing(method) )
+
+
+
+
+    
     print u"testing"
-    from numpy import array
+    
     a = AccuDict( AccuDict, { 'FR' : AccuDict(AccuDict,  
         AccuDict( array, { 'paris' : array( [  1 , 3 ] )}  ) )} )
 
