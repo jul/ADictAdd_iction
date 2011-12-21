@@ -1,9 +1,9 @@
 #!/sr/bin/python
 # -*- coding: utf-8 -*-
 #WTFPL
-"""maybe giving a sense to 
+"""maybe giving a sense to
 dict( { a : 1 } ) + dict(  { a : 2 } ) + dict( { b : 2 } )
-would be a practical for map reduce operations in nosql/large dataset 
+would be a practical for map reduce operations in nosql/large dataset
 (HDF5 iterators) like context. Je dis ça, je dis rien"""
 
 from accu_dict import objwalk, AccuDict
@@ -16,7 +16,7 @@ from numpy import array
 ### having individual votes of cooolness per langage
 ### should be a very large dataset to be funnier
 
-mocking_nosql =  u"""george,FR,fun,perl,2
+mocking_nosql = u"""george,FR,fun,perl,2
 roger,FR,serious,python,3
 christine,DE,fun,python,3
 bob,US,serious,php,1
@@ -24,7 +24,7 @@ isabelle,FR,fun,perl,10
 Kallista,FR,unfun,c#,-10
 Nellev,FR,typorigid,python,1
 haypo,FR,javabien,python,1
-potrou,FR,globally locked,python,1 
+potrou,FR,globally locked,python,1
 petra,DE,sexy,VHDL,69"""
 
 nosql_iterator = reader
@@ -36,23 +36,23 @@ COOLNESS = 4
 
 w = writer(os.sys.stdout)
 
-## basic example for counting langage users nothing more interesting than 
+## basic example for counting langage users nothing more interesting than
 ## what collections.counter does
 print ""
-w.writerow( [ "langage", "how many users" ] )
-map( w.writerow,
+w.writerow(["langage", "how many users"])
+map(w.writerow,
     objwalk(
         reduce(
             ## well that is a complex reduce operation :)
-            AccuDict.__iadd__ ,
+            AccuDict.__iadd__,
             map(
-                lambda document : AccuDict( int, { document[ LANGAGE ] : 1 } ),
-                nosql_iterator( StringIO( mocking_nosql ) )
+                lambda document: AccuDict(int, {document[LANGAGE]: 1}),
+                nosql_iterator(StringIO(mocking_nosql))
             )
         )
     )
 )
-"""expected result : 
+"""expected result :
 langage,how many users
 python,3
 c#,1
@@ -63,55 +63,56 @@ perl,2
 print "\n" * 2 + "next test\n"
 ### example with group by + aggregation of a counter
 ### counting all langage per country with their coolness and number of users
-### Hum .... I miss a sort and a  limit by to be completely SQL like compatible 
-w.writerow( [ "country", "langage",  "coolness", "howmany" ] )
-map( w.writerow,
+### Hum .... I miss a sort and a  limit by to be completely SQL like compatible
+w.writerow(["country", "langage", "coolness", "howmany"])
+map(w.writerow,
     objwalk(
         ##nosql like reduce
         reduce(
             ## well that is the same very complex reduce operation :)
-            AccuDict.__iadd__ ,
+            AccuDict.__iadd__,
             ##nosql like map where we emit interesting subset of the record
             map(
-                lambda document : AccuDict(
+                lambda document: AccuDict(
                     AccuDict, {
                         #KEY
-                        document[COUNTRY] :
+                        document[COUNTRY]:
                         AccuDict(
                             array,
                             {
                                 #GROUPBY
-                                document[LANGAGE] :
+                                document[LANGAGE]:
                                 #AGGREGATOR
-                                array(  [
+                                array([
                                     #Counter
                                     int(document[COOLNESS]),
                                     #presence
                                     1
-                                ] )
+                                ])
                             }
                         ),
                         ## making a (sub) total on the fly
-                        'total_coolness_and_voters' : array( [ 
-                            int( document[COOLNESS]), 1  
-                        ] ) 
+                        'total_coolness_and_voters': array([
+                            int(document[COOLNESS]), 1
+                        ])
                     }
                 ),
+
                 ## nosql like filter that should be in the map if it was nosql
-                ## maybe we also need a map that accepts None as a result and skip 
-                ## the result in the resulting iterator, 
-                ## or a skip() callable in lambda ? 
-                ## or sub()  like in perl with curly braces 
+                ## maybe we also need a map that accepts None as a result and
+                ## skip the result in the resulting iterator,
+                ## or a skip() callable in lambda ?
+                ## or sub()  like in perl with curly braces
                 ## joke : combining map / filter is easy enough
                 filter(
-                    lambda document : "php" != document[ LANGAGE ],
-                    nosql_iterator( StringIO( mocking_nosql ) )
+                    lambda document: "php" != document[LANGAGE],
+                    nosql_iterator(StringIO(mocking_nosql))
                 )
             )
         )
     )
 )
-"""expected result : 
+"""expected result :
 country,langage,coolness,howmany
 FR,python,4,2
 FR,c#,-10,1
@@ -120,4 +121,3 @@ total_votes_and_coolness,7,78
 DE,python,3,1
 DE,VHDL,69,1
 """
-
