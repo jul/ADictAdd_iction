@@ -18,15 +18,18 @@ That I resume as follow :
 
 Addition should follow these rules 
 
- a + b = b + a 
- a + neutral = a 
- 1 * a = a 
- an_int * a = a + ... + a (n times ) 
- an_int * a = a * an_int 
- -a = -1 * a 
- a - b = a + ( -1 * b) 
- an_int ( a + b) = an_int *a + an_int * b 
+> a + b = b + a 
+> a + neutral = a 
+> 1 * a = a 
+> an_int * a = a + ... + a (n times ) 
+> an_int * a = a * an_int 
+> -a = -1 * a 
+> a - b = a + ( -1 * b) 
+> an_int ( a + b) = an_int *a + an_int * b 
 
+for complete result see : 
+
+https://github.com/jul/ADictAdd_iction/wiki/test_result
 
 You'll notice through some example that some python default objects dont
 comply to the addition as we know in linear algebrae.
