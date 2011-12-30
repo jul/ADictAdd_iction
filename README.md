@@ -109,6 +109,7 @@ into algebraic definition ?
 
 I may have a single unpythonic reason to love this idea of introducing consistens
 distincts algebrae in a programming langage : 
+
 - it opens new doors to what we can express in few words ;
 - it seems utterly fun ! 
 
