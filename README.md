@@ -3,7 +3,7 @@ I want to add addition to dict in python !
 It seems a long time ago in a faraway galaxy some wise men decided
 dict() + dict() had no sense amongst the python jedis.
 
-The were wondering : what happens when to keys collides ? 
+They were wondering : what happens when to keys collides ? 
 
 Well, who cares ? 
 
@@ -16,7 +16,8 @@ someone familiar to addition expect.
 
 That I resume as follow : 
 
-Addition should follow these rules 
+Addition should follow these rules (cf Mc Graw Hill Linear 
+Algebrae Chapter 1 by Seymour Lipschutz)
 
 > a + b = b + a 
 
@@ -34,6 +35,13 @@ Addition should follow these rules
 
 > an_int ( a + b) = an_int *a + an_int * b 
 
+> ( a + b ) + c = a + ( b + c )
+
+> ( an_int + another_int ) a  = an_int * a + another_int * a
+
+> ( an_int * another_int ) a = an_int (  another_int * a ) 
+
+
 
 for complete result see : 
 
@@ -49,7 +57,7 @@ But, given a magical definition, dict + dict behaves in a consistent way.
 Mostly like an arbitrary vector whose orhtogonal dimensions are those define 
 by the path to the keys, and for wich the value is a something that also supports the
 same rules. (This at my opinion is just a too strong limitation, but I try to avoid
-that some people choke on other behaviour).
+that some people get apoplexia).
 
 Has it a sense ? 
 
@@ -71,7 +79,7 @@ matrix, and a whole new sets of operations very usefull in map reduce operations
 In the era of big data we could do in a single operation things such as : 
 
 - correlation matrix ; 
-- measuring keywords vectors cosine with text (therefore textual indexation) ; 
+- cosine between dict ;
 - projecting vectors from one space to the others (such as natural translations);
 
 And through the sheer help of algorithms we could do stuff unheard in mathematics
