@@ -106,7 +106,7 @@ class consistent_addition(object):
         return (self.neutral + self.one, self.one)
 
     @fixture_and_test
-    def test_mul_scal(self):
+    def test_scalar_multiplication(self):
         """ an_int * a = a + ... + a (n times ) """
         left = self.scalar * self.one
         right = self.one
@@ -115,12 +115,12 @@ class consistent_addition(object):
         return (left, right)
 
     @fixture_and_test
-    def test_neutral_mul_scal(self):
+    def test_multiplicative_identity(self):
         """ 1 * a = a """
         return 1 * self.one, self.one
 
     @fixture_and_test
-    def test_add_permut(self):
+    def test_associativity(self):
         """( a + b )  + c  = a + ( b + c )"""
         return (
             self.one + (self.other + self.another),
@@ -143,7 +143,7 @@ class consistent_addition(object):
         return self.one / 2, .5 * self.one
 
     @fixture_and_test
-    def test_other_mul_scal_commut(self):
+    def test_multiply_scalar_associativity(self):
         """ ( an_int + other_scalar ) a = an_int * a  + other_scalar * a """
         return (
            (self.scalar + self.other_scalar) * self.one,
@@ -151,39 +151,35 @@ class consistent_addition(object):
        )
 
     @fixture_and_test
-    def test_mul_scal_commut(self):
+    def test_scalar_commutativity(self):
         """ an_int * a = a * an_int """
         return self.scalar * self.one, self.one * self.scalar
 
     @fixture_and_test
-    def test_permut_scal_mul(self):
+    def test_associativity_scalar_multiplication(self):
         """ ( an_int *  other_scalar ) * a = an_int ( other_scalar * a )"""
         return (
            (self.scalar * self.other_scalar) * self.one,
             self.scalar * (self.other_scalar * self.one))
 
     @fixture_and_test
-    def test_neg(self):
+    def test_negative(self):
         """ -a = -1 * a """
         return -1 * self.one, self.one.__neg__()
 
     @fixture_and_test
-    def test_sub(self):
+    def test_substraction(self):
         """ a - b = a + ( -1 * b) """
         return self.one - self.other, self.one + (-1 * self.other)
 
     @fixture_and_test
-    def test_scal_lin_combo(self):
+    def test_distributivity(self):
         """ an_int ( a + b) = an_int *a + an_int * b """
         return (
             self.scalar * (self.one + self.other),
             self.scalar * self.one + self.scalar * self.other
         )
 
-    @fixture_and_test
-    def test_permutation(self):
-        """a + b = b + a """
-        return (self.one + self.other, self.other + self.one)
 
     @fixture_and_test
     def conservation(self):
@@ -208,16 +204,15 @@ class consistent_addition(object):
         self.test_neutral()
 
     def BetterCommutativity(self):
-        self.test_neutral_mul_scal()
-        self.test_mul_scal()
-        self.test_mul_scal_commut()
-        self.test_neg()
-        self.test_permutation()
-        self.test_other_mul_scal_commut()
-        self.test_permut_scal_mul()
-        self.test_add_permut()
-        self.test_sub()
-        self.test_scal_lin_combo()
+        self.test_multiplicative_identity()
+        self.test_scalar_multiplication()
+        self.test_scalar_commutativity()
+        self.test_negative()
+        self.test_associativity_scalar_multiplication()
+        self.test_multiply_scalar_associativity()
+        self.test_associativity()
+        self.test_substraction()
+        self.test_distributivity()
         self.algebraic_logic = True
 
     def Conservation(self):
