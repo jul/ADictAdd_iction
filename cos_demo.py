@@ -1,33 +1,39 @@
 #env python
 # -*- coding: utf-8 -*-
-# 
+"""
+playing with cos and dot product of dict
 
+"""
 from math import sqrt
 from numpy import array
-from accu_dict import *
+from accu_dict import VectorDict
 
-def assert_is_cos( func ):
+
+def assert_is_cos(func):
     """verify that a functions returns an int or a float in [-1;1]
     sneakily cast the return value in float to check the return value
     is castable as float
     """
-    def wrapper( *a, **kw):
-        res = func( *a , **kw )
-        if 1 >= float( res ) >= -1:
+    def wrapper(*a, **kw):
+        res = func(*a, **kw)
+        if 1 >= float(res) >= -1:
             try:
-                return float( res )
+                return float(res)
             except Exception as e:
-                raise Exception("wrong type %r for cos return (%r)" % (
-                    res.__class , e 
-                ) )
+                raise Exception(
+                    "wrong type %r for cos return (%r)" % (
+                    res.__class, e
+                    )
+                )
         else:
-            raise Exception("Cosinus : invalid range %r %r(%r ,%r) " % ( 
-                res, func, a , kw 
-            ) )
+            raise Exception("Cosinus : invalid range %r %r(%r ,%r) " % (
+                    res, func, a, kw
+                )
+            )
         return res
     return wrapper
 
-data = [ 
+data = [
     dict(
         physical = dict(
             eye = "00FF00",
@@ -36,9 +42,9 @@ data = [
         ),
         name = "jenny",
         salary = 500.00,
-        presentation= [ 
-            ( "modeling show", "Paris", 2012) , 
-            ( "green cover", "Vogue", 2011 ),
+        presentation= [
+            ("modeling show", "Paris", 2012),
+            ("green cover", "Vogue", 2011),
         ],
     ),
     dict(
@@ -49,11 +55,11 @@ data = [
         ),
         name = "noxco",
         salary = 700.00,
-        presentation= [ 
-            ( "green cover", "Vogue", 2011 ),
-            ( "catholic fashion show", "Roma", 1977 ),
+        presentation= [
+            ("green cover", "Vogue", 2011),
+            ("catholic fashion show", "Roma", 1977),
         ],
-        program = [ "python" ],
+        program = ["python"],
     ),
     dict(
         physical = dict(
@@ -63,13 +69,19 @@ data = [
         ),
         name = "Derpina",
         salary = 300.00,
-        program = [ "python", "Perl" ],
-        hobby = [ "sky", "9gag" ]
+        program = ["python", "Perl"],
+        hobby = ["sky", "9gag"]
     ),
 ]
 
+
+@assert_is_cos
+def bankable_cos( input_dict ):
+    """the more a model has been exposed the more valuable it is"""
+    return 1.0 * (  2.0 *  min( len(input_dict.get("presentation",[])), 3) / 3 - 1 )
+
 def matrix( input_dict ):
-    return AccuDict( float, 
+    return VectorDict( float, 
         dict( 
             eye = eye_cos( "00FF00", input_dict ),
             fitness = imc_cos( 
@@ -82,7 +94,7 @@ def matrix( input_dict ):
             ## as long as its between -1, 1 it is a cos :) why bother 
             ## the more someone took parts in event (given a threshold) 
             ## then he or she is bankable
-            bankable =  1.0 * (  2.0 *  min( len(input_dict.get("presentation",[])), 3) / 3 - 1 )   ,
+            bankable = bankable_cos( input_dict ),
             extra = extra_cos( input_dict ),
             not_too_expensive = wage_cos(300.0, 700, input_dict )
        )
@@ -135,8 +147,6 @@ def imc_cos( imc, ideal_imc, max_var):
     """return 1 if it is exactly the imc
     -1 if imc belongs to [ imc + max_var, inf [ or ] 0; imc - max_var ]
     linear in between"""
-    #print  ( - 2 *  abs( imc - ideal_imc )  / ( max_var ) + 1 , -1 )
-    #print  max( - 2 *  abs( imc - ideal_imc )  / ( max_var ) + 1 , -1 )
     return  max( - 2 *  abs( imc - ideal_imc )  / ( max_var ) + 1 , -1 )
 
 @assert_is_cos 
@@ -150,14 +160,12 @@ def eye_cos( prefered_color, input_dict):
     ] )
     prefered_vect =  array([ int(x) for x in bytearray.fromhex(prefered_color)[0::1] ] )
     max_size = norm( prefered_vect ) * norm( rgb_vect ) 
-    print "%r <=> %r" % ( rgb_vect, prefered_vect )
-
     return  max_size > 0  and  ( 
-                1.0 * sum( prefered_vect * rgb_vect)  / ( max_size)
+                1.0 * sum( prefered_vect * rgb_vect)  / ( max_size )
             ) or -1
 
 
-criterion_ponderation = AccuDict(float, dict( 
+criterion_ponderation = VectorDict(float, dict( 
     eye = 1 ,
     fitness = 5,
     bankable = 4,
@@ -165,30 +173,22 @@ criterion_ponderation = AccuDict(float, dict(
     not_too_expensive = .1
 ) )
 
-ideal = AccuDict( 
-    float, dict( 
-    eye = 1 ,
-    fitness = 1,
-    bankable = 3,
-    extra = 1, 
-    not_too_expensive = 1
-    )
-)
 norm_of_choice = criterion_ponderation.dot(criterion_ponderation)
 
 
-for candidate,cos in    map ( 
-            lambda x :  [ AccuDict(AccuDict,x) , criterion_ponderation.cos( 
-                         matrix( x )  
-                    )
-                ] , 
+for candidate,ldot in    map ( 
+            lambda x :  [ 
+                VectorDict(VectorDict,x) , criterion_ponderation.dot( 
+                    criterion_ponderation * matrix( x ) 
+                )
+            ] , 
             data
         ) : 
-    if cos > .5:
+    if ldot > .5:
          candidate.pprint()
-         print "fitting with a cos of %f" % cos
+         print "fitting with a projection of %f" % ldot
 
-criterion_ponderation = AccuDict(float, dict( 
+criterion_ponderation = VectorDict(float, dict( 
     eye = 1.0,
 ) )
 print "\n"
@@ -196,27 +196,24 @@ print "*" * 80
 print "must have green eyes " 
 
 for candidate,ldot in    map ( 
-            lambda x :  [ AccuDict(AccuDict,x) , criterion_ponderation.dot( 
-                           criterion_ponderation.homothetia(matrix( x ))  
-                    )
-                ] , 
+            lambda x :  [ 
+                VectorDict(VectorDict,x), criterion_ponderation.dot( matrix( x ) )
+            ] ,
             data
         ) : 
-    print "***dot == >>>>%r<<<<<" % ldot
-    criterion_ponderation.homothetia(matrix(candidate)).pprint()
+    #criterion_ponderation.homothetia(matrix(candidate)).pprint()
     if 1.0 == ldot:
          print "MATCH"
          candidate.pprint()
          print "has a projection on maximum fit of 1 %f" % ldot
 
-criterion_ponderation = AccuDict(float, dict( 
-    fitness = 1.0,
+criterion_ponderation = VectorDict(float, dict( 
+    fitness = 1.0 ,
 ) )
 
 by_fitness = map ( 
-            lambda x :(   AccuDict(AccuDict,x) , criterion_ponderation.dot( 
-                       matrix( x )  
-                    )
+            lambda x :(   
+                VectorDict(VectorDict,x), criterion_ponderation.dot(matrix( x ) )
                 ), 
             data
     )  
@@ -224,6 +221,6 @@ by_fitness = map (
 print "*" * 80
 
 print "best candidate IMC is " 
-candidate , cos = sorted( by_fitness, cmp= lambda x,y : - cmp( x[1], y[1] ))[0]
-print "with a cos of %f" % cos
+candidate , ldot = sorted( by_fitness, cmp= lambda x,y : - cmp( x[1], y[1] ))[0]
+print "with a projection of %f" % ldot 
 candidate.pprint()

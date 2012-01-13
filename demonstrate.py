@@ -6,7 +6,7 @@ dict( { a : 1 } ) + dict(  { a : 2 } ) + dict( { b : 2 } )
 would be a practical for map reduce operations in nosql/large dataset
 (HDF5 iterators) like context. Je dis ça, je dis rien"""
 
-from accu_dict import objwalk, AccuDict
+from accu_dict import objwalk, VectorDict
 from csv import reader, writer
 import os
 from io import StringIO
@@ -44,9 +44,9 @@ map(w.writerow,
     objwalk(
         reduce(
             ## well that is a complex reduce operation :)
-            AccuDict.__iadd__,
+            VectorDict.__iadd__,
             map(
-                lambda document: AccuDict(int, {document[LANGAGE]: 1}),
+                lambda document: VectorDict(int, {document[LANGAGE]: 1}),
                 nosql_iterator(StringIO(mocking_nosql))
             )
         )
@@ -70,14 +70,14 @@ map(w.writerow,
         ##nosql like reduce
         reduce(
             ## well that is the same very complex reduce operation :)
-            AccuDict.__iadd__,
+            VectorDict.__iadd__,
             ##nosql like map where we emit interesting subset of the record
             map(
-                lambda document: AccuDict(
-                    AccuDict, {
+                lambda document: VectorDict(
+                    VectorDict, {
                         #KEY
                         document[COUNTRY]:
-                        AccuDict(
+                        VectorDict(
                             array,
                             {
                                 #GROUPBY

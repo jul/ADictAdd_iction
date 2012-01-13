@@ -6,7 +6,7 @@ from math import sqrt
 #WTFPL
 """Overriding collections.DefaultDict to support addition """
 
-all = ['AccuDict', 'objwalk', 'flattening', 'can_be_walked']
+all = ['VectorDict', 'objwalk', 'flattening', 'can_be_walked']
 ##mouais le test sur list ou tuple quand on a du numpy.array ça sux
 ## puis si on peut le parcourir ça quake "__iter__"
 
@@ -57,7 +57,7 @@ def iter_object(obj, path=(), **opt):
                 x for x in flattening( path ) 
             ] or path, obj   
 
-class AccuDict(defaultdict):
+class VectorDict(defaultdict):
     """DefaultDict with addition"""
 
     def __init__(self, *a, **kw):
@@ -116,7 +116,7 @@ class AccuDict(defaultdict):
         missing keys in the pseudo diagonal matrix are pruned"""
 
         common_key =  set( self.keys() ) &  set( other.keys() )
-        new_dict = AccuDict(AccuDict, dict() )
+        new_dict = VectorDict(VectorDict, dict() )
         for k in common_key:
             if  hasattr( self[k], "homothetia") :
                 new_dict[k] = (self[k]).divide( other[k] )
@@ -130,7 +130,7 @@ class AccuDict(defaultdict):
         missing keys in the pseudo diagonal matrix are pruned"""
 
         common_key =  set( self.keys() ) &  set( other.keys() )
-        new_dict = AccuDict(AccuDict, dict() )
+        new_dict = VectorDict(VectorDict, dict() )
         for k in common_key:
             if  hasattr( self[k], "homothetia") :
                 new_dict[k] = (self[k]).homothetia( other[k] )
@@ -181,7 +181,7 @@ class AccuDict(defaultdict):
         
         #print "%r //%r" %  (self, integer)
         another = self.copy()
-        if isinstance(scalar, AccuDict ):
+        if isinstance(scalar, VectorDict ):
             return another.divide( scalar )
         #print "%r * %r " % (integer, another)
         for k, v in self.iteritems():
@@ -191,7 +191,7 @@ class AccuDict(defaultdict):
     def __rmul__(self, scalar):
         #print "%r //%r" %  (self, integer)
         another = self.copy()
-        if isinstance(scalar, AccuDict ):
+        if isinstance(scalar, VectorDict ):
             return self.homothetia(scalar)
             
         #print "%r * %r " % (integer, another)
@@ -260,31 +260,31 @@ if '__main__' == __name__:
    #         print "OUT: %r => %r" % (callme, res)
    #         return result
    #     return wrapper
-   # for method in AccuDict.__dict__.keys():
+   # for method in VectorDict.__dict__.keys():
    #     if method.startswith("__"):
    #         print "%r " % (method,)
    #         setattr(int, method, tracing(method))
 
     print u"testing"
 
-    a = AccuDict(AccuDict, {'FR': AccuDict(AccuDict,
-        AccuDict(array, {'paris': array([1, 3])}))})
+    a = VectorDict(VectorDict, {'FR': VectorDict(VectorDict,
+        VectorDict(array, {'paris': array([1, 3])}))})
 
     print u"testing"
-    a += AccuDict(
-            AccuDict, {
-                'FR': AccuDict(
-                    AccuDict, AccuDict(
+    a += VectorDict(
+            VectorDict, {
+                'FR': VectorDict(
+                    VectorDict, VectorDict(
                             array, {'paris': array([1, 3])}
                        )
                    )
            }
        )
-    b = AccuDict(
-            AccuDict, {
+    b = VectorDict(
+            VectorDict, {
                 'FR':
-                 AccuDict(AccuDict,
-                        AccuDict(
+                 VectorDict(VectorDict,
+                        VectorDict(
                             array, {'lyon': array([1, 3])}
                        )
                     )
