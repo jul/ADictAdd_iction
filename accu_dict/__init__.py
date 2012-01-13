@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
 from collections import Sequence, Mapping
+from math import sqrt
 #WTFPL
 """Overriding collections.DefaultDict to support addition """
 
@@ -28,7 +29,8 @@ def flattening(a_duck):
                 yield duckling
 
 
-def objwalk(obj, path=(), limit=False):
+
+def objwalk(obj, path=(), limit=False, ):
     """
     Generator on all leaves of the object, return an array of the path and the
     leaf
@@ -37,17 +39,23 @@ def objwalk(obj, path=(), limit=False):
      http://tech.blog.aknin.name/2011/12/11/walking-python-objects-recursively/
     """
     if isinstance(obj, Mapping):
-
         for key, value in obj.iteritems():
             for child in objwalk(value, path + (key,)):
-                yield child
-    elif isinstance(obj, Sequence) and not isinstance(obj, basestring):
-        for index, value in enumerate(obj):
-            for child in objwalk(value, path + (index, )):
                 yield child
     else:
         yield [x for x in flattening((path,  obj))]
 
+def iter_object(obj, path=(), **opt):
+    flatten = opt.get("flatten", False)
+
+    if isinstance(obj, Mapping):
+        for key, value in obj.iteritems():
+            for child in iter_object(value, path + (key,), **opt):
+                yield  child
+    else:
+        yield  flatten and [ 
+                x for x in flattening( path ) 
+            ] or path, obj   
 
 class AccuDict(defaultdict):
     """DefaultDict with addition"""
@@ -56,6 +64,15 @@ class AccuDict(defaultdict):
         """constructor"""
         defaultdict.__init__(self, *a, **kw)
 
+    def __div__(left1, left2, *a, **lw):
+        """dict by dict division"""
+        if isinstance(left2, (float, int, complex)):
+            return left1.__rdiv__(left2)
+        if isinstance(left1, (float, int, complex)):
+            return left2.__rdiv__(left1)
+        else:
+            return left1.divide(left2)
+
     def __mul__(left1, left2, *a, **lw):
         """muler"""
         if isinstance(left2, (float, int, complex)):
@@ -63,14 +80,82 @@ class AccuDict(defaultdict):
         if isinstance(left1, (float, int, complex)):
             return left2.__rmul__(left1)
         else:
-            raise Exception("to be soon implemented")
+            return left1.homothetia(left2)
 
     def __neg__(self):
         for k, v in self.iteritems():
-            self[k] = -1 * v
+           self[k] = -1 * v
         return self
 
+    
+    def as_vector_iter(self, path=()): 
+        """
+        iterator on key value pair of nested dict in the form of 
+        set( key0, key1, key2 ), child
+        for a dict, therefore making a n-depth dict being homomorph
+        to a single dimension vector in the form of 
+        k , v 
+        where k is the path, v is the leaf value
+        source:
+         http://tech.blog.aknin.name/2011/12/11/walking-python-objects-recursively/
+        """
+        return iter_object(self,(),flatten=False)
+    
+    def as_row_iter(self, path=()): 
+        """
+        iterator on key value pair of nested dict yielding items in the form
+        set( key0, key1, key2 , child)
+        very useful for turning a dict in a row for a csv output
+        all keys and values are flattened
+        """
+        return iter_object(self,(),flatten=True)
+
+    def divide(self, other):
+        """multiplying to vectors as one vector of homothetia * vector
+        it is a shortcut for a multiplication of a diagonal matrix
+        missing keys in the pseudo diagonal matrix are pruned"""
+
+        common_key =  set( self.keys() ) &  set( other.keys() )
+        new_dict = AccuDict(AccuDict, dict() )
+        for k in common_key:
+            if  hasattr( self[k], "homothetia") :
+                new_dict[k] = (self[k]).divide( other[k] )
+            else:
+                new_dict[k] = self[k] / other[k]
+        return new_dict
+
+    def homothetia(self, other):
+        """multiplying to vectors as one vector of homothetia * vector
+        it is a shortcut for a multiplication of a diagonal matrix
+        missing keys in the pseudo diagonal matrix are pruned"""
+
+        common_key =  set( self.keys() ) &  set( other.keys() )
+        new_dict = AccuDict(AccuDict, dict() )
+        for k in common_key:
+            if  hasattr( self[k], "homothetia") :
+                new_dict[k] = (self[k]).homothetia( other[k] )
+            else:
+                new_dict[k] = self[k] * other[k]
+        return new_dict
+    def dot(self, other):
+        """scalar  = sum items self * other 
+        norm of the projection of self on other"""
+        return sum( [ 1.0 * v for k,v in ( self * other ).as_vector_iter()  ] )
+    
+    #def values(self):
+    #    return ( v for k,v in self.as_vector_iter() )
+
+    def norm(self):
+        return sqrt(self.dot(self))
+
+    def cos( self, other ):
+        return 1.0 * self.dot( other) / self.norm() / other.norm()
+
+            
+
     def __imul__(integer, self):
+        if not isinstance(integer, int):
+            raise Exception("wrong type in dict multiplication")
         #print "%r //%r" %  (self, integer)
         print "imul called"
         another = self.copy()
@@ -92,11 +177,23 @@ class AccuDict(defaultdict):
                 positive[k] = -v
         return positive
 
+    def __rdiv__(self, scalar):
+        
+        #print "%r //%r" %  (self, integer)
+        another = self.copy()
+        if isinstance(scalar, AccuDict ):
+            return another.divide( scalar )
+        #print "%r * %r " % (integer, another)
+        for k, v in self.iteritems():
+            another[k] =  v / scalar
+        return another
+
     def __rmul__(self, scalar):
         #print "%r //%r" %  (self, integer)
         another = self.copy()
-        if not isinstance(scalar, (float, complex, int)):
-            raise Exception("Unhandled rmul type for %r " % scalar)
+        if isinstance(scalar, AccuDict ):
+            return self.homothetia(scalar)
+            
         #print "%r * %r " % (integer, another)
         for k, v in self.iteritems():
             another[k] = scalar * v
@@ -115,6 +212,13 @@ class AccuDict(defaultdict):
                 positive[k] = -v
         return positive
 
+    def pprint(self):
+        print "\n".join( [ 
+                    "%r=%r" % (
+                        "->".join( map(str, k)), 
+                        v
+                    ) for k, v in self.as_vector_iter() ] )
+                
     def __add__(left1, left2):
         """adder"""
         left1_big = len(left1.keys()) > len(left2.keys())
@@ -126,7 +230,7 @@ class AccuDict(defaultdict):
             else:
                 bigger[k] = v
         return bigger
-
+        
     def __iadd__(self, other):
         """adder"""
         self = self.__add__(other)
@@ -191,3 +295,4 @@ if '__main__' == __name__:
     a += b
     for el in objwalk(a):
         print "<%r>" % (el or "",)
+    print "%r" % "-".join( [ repr(k) for k,v in a.as_vector() ] )
