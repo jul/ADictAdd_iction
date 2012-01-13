@@ -6,7 +6,7 @@ playing with cos and dot product of dict
 """
 from math import sqrt
 from numpy import array
-from accu_dict import VectorDict
+from vector_dict import VectorDict
 
 
 def assert_is_cos(func):

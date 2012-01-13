@@ -6,7 +6,7 @@ dict( { a : 1 } ) + dict(  { a : 2 } ) + dict( { b : 2 } )
 would be a practical for map reduce operations in nosql/large dataset
 (HDF5 iterators) like context. Je dis ça, je dis rien"""
 
-from accu_dict import objwalk, VectorDict
+from vector_dict import objwalk, VectorDict
 from csv import reader, writer
 import os
 from io import StringIO

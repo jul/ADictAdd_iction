@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #WTFPL
 
-from accu_dict import VectorDict, can_be_walked
+from vector_dict import VectorDict, can_be_walked
 
 from copy import deepcopy
 
@@ -20,7 +20,9 @@ class consistent_addition(object):
     """test wether an addition for two object is consistant"""
 
     def __init__(self, **kw):
-        self.counter = 1
+        self.fail = 0
+        self.context= kw.get("context", "print" )
+        self.counter = 0
         self.success = 0
         self.neutral = None
         self.one = None
@@ -35,15 +37,16 @@ class consistent_addition(object):
         self.scalar = kw.get("scalar", 3)
         self.other_scalar = kw.get("other_scalar", 4)
         self.collect_values = kw.get("collect_values", lambda x: x)
-        print "\n" + "*" * 50
-        print "\ntesting for  %r class\n" % (self._one.__class__.__name__)
-        print " a = %r" % self._one
-        print " b = %r" % self._other
-        print " c = %r" % self._another
-        print " an_int = %r " % self.scalar
-        print " other_scalar = %r " % self.other_scalar
-        print " neutral element for addition is %r " % self._neutral
-        print "\n" + "*" * 50
+        if "print" == self.context :
+            print "\n" + "*" * 50
+            print "\ntesting for  %r class\n" % (self._one.__class__.__name__)
+            print " a = %r" % self._one
+            print " b = %r" % self._other
+            print " c = %r" % self._another
+            print " an_int = %r " % self.scalar
+            print " other_scalar = %r " % self.other_scalar
+            print " neutral element for addition is %r " % self._neutral
+            print "\n" + "*" * 50
 
         self.LesserCommutativity()
         if hasattr(self.one, '__rmul__'):
@@ -54,19 +57,41 @@ class consistent_addition(object):
 
     def __del__(self):
         """success or not ? """
-        print "*" * 50 + "\n"
-        if self.counter - 1 == self.success and self.algebraic_logic:
-            print "%r respects the algebraic acceptation of addition" % (
+        if "print" == self.context:
+            print "*" * 50 + "\n"
+            if self.counter - 1 == self.success and self.algebraic_logic:
+                print "%r respects the algebraic acceptation of addition" % (
+                    self._one.__class__
+                )
+
+            else:
+                print "%r follows the dutch logic " % (
                 self._one.__class__
             )
-
+            print "\n" + "*" * 50
         else:
-            print "%r follows the dutch logic " % (
-            self._one.__class__
-        )
-        print "\n" + "*" * 50
+            print "%(success)d/%(counter)d test passed" % ( self.__dict__ )
+            if self.success == self.counter:
+                print "test PASSED"
+            else: 
+                raise Exception("Test Failed")
 
     def fixture_and_test(method):
+        def pprint(self,method, res, left, right):
+            print "\ntest #%d" % self.counter
+            print method.__doc__
+            print "%s is %s" % (method.__name__, res)
+            if "ko" == res:
+                print res
+                print "%r != %r " % (left, right)
+        def praise(self,method, res, left, right):
+            if "ko" == res:
+                print "FAIL"
+                print "test #%d" % self.counter
+                print method.__doc__
+                print "%r != %r " % (left, right)
+                self.fail += 1
+
         def reinit_me(self, *a, **kw):
             to_reinit = dict(_one="one",
                              _other="other",
@@ -78,6 +103,7 @@ class consistent_addition(object):
 
             res = "Arg : "
             is_equal = False
+            (left,right) = (None , None)
             try:
                 (left, right) = method(self, *a, **kw)
                 if self.equal:
@@ -87,13 +113,14 @@ class consistent_addition(object):
                 res = is_equal and "ok" or "ko"
             except Exception as e:
                 res += "%r" % e
-            print "\ntest #%d" % self.counter
-            print method.__doc__
-            print "%s is %s" % (method.__name__, res)
-            self.counter += 1
-            self.success += is_equal and 1 or 0
-            if "ko" == res:
-                print "%r != %r " % (left, right)
+            finally:
+                self.counter += 1
+                self.success += is_equal and 1 or 0
+                if 'print' == self.context:
+                    pprint(self, method, res, left, right )
+                else:
+                    praise(self, method, res, left, right)
+ 
         return reinit_me
 
     @fixture_and_test
