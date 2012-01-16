@@ -63,21 +63,19 @@ for pair in text_grapher(t4).as_row_iter():
     path.pop(-2) 
     node = node | set( x for x in flattening(path)  )
     
-    label += [ u"->".join(str(x) for x in path ) ]
+    label += [ u"->".join(str(x) for x in path[1::] ) ]
 
     while len(path) >= 2:
-        if ( path[0:2]) not in edge:
+        if isinstance( path[1], int) or ( path[0:2]) not in edge :
             edge += [ ( path[0:2] ) ]
         path.pop(0)
     
 for n in node:
     graph.add_node( pd.Node( n) )
-#print "%r" % edge
 for e in edge:
-#    print "E %r" % e
     arg = dict()
-#    if isinstance(e[1],int):
-#        arg = dict( label = label.pop(-1))
+    if isinstance(e[1],int):
+        arg = dict( label = label.pop(0))
 
     graph.add_edge( pd.Edge( e[0], e[1], arrowhead="normal", **arg ))
 
