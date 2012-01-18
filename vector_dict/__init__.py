@@ -6,10 +6,18 @@ from math import sqrt
 #WTFPL
 """Overriding collections.DefaultDict to support addition """
 
-all = ['VectorDict', 'objwalk', 'flattening', 'can_be_walked']
+all = ['VectorDict', 'objwalk', 'path_from_array', 'flattening', 'can_be_walked']
 ##mouais le test sur list ou tuple quand on a du numpy.array ça sux
 ## puis si on peut le parcourir ça quake "__iter__"
 
+
+def path_from_array(path):
+    """adding a path to a vector"""
+    path_to_key = list(path)
+    current = VectorDict( VectorDict, { path_to_key.pop() : path_to_key.pop()})
+    while len(path_to_key):
+        current = VectorDict( VectorDict, { path_to_key.pop() : current})
+    return current 
 
 def can_be_walked(stuff):
     """tells if it is walkable """
@@ -22,7 +30,7 @@ def flattening(a_duck):
         yield a_duck
     else:
         for duckling in a_duck:
-            if can_be_walked(duckling):
+            if can_be_walked(duckling) and not isinstance( duckling, str) :
                 for duck_eggs in flattening(duckling):
                     yield duck_eggs
             else:
@@ -72,6 +80,8 @@ class VectorDict(defaultdict):
             return left2.__rdiv__(left1)
         else:
             return left1.divide(left2)
+   
+
 
     def __mul__(left1, left2, *a, **lw):
         """muler"""
@@ -215,7 +225,7 @@ class VectorDict(defaultdict):
     def pprint(self):
         print "\n".join( [ 
                     "%r=%r" % (
-                        "->".join( map(str, k)), 
+                        "->".join( map(unicode, k)), 
                         v
                     ) for k, v in self.as_vector_iter() ] )
                 
