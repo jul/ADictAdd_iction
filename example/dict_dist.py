@@ -1,5 +1,6 @@
-#!/usr/bin/python
-# -*- encoding=utf-8 -*-
+#!env python
+# -*- coding: utf-8 -*-
+
 """
 Simple test of dictionnary distance with strings being casted as
 vectors of letters. And comparaison of misc candidates to the "reference"
