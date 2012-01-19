@@ -2,6 +2,7 @@
 README
 README.md
 README.rst
+CHANGES.txt
 setup.py
 example/cos_demo.py
 example/demonstrate.py
