@@ -33,7 +33,7 @@ def closest( candidate ):
     cand_vect = string_as_vect(candidate)
     print "** for the word <%s>" % candidate
     
-    print "better jackard similarity : "
+    print "better jaccard similarity : "
     print "%s/%r" % sorted(
         [ (w, cand_vect.jackard(v)) for w, v in vectors.iteritems() ],
         key = lambda x: x[1], reverse=True
