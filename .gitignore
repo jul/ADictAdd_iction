@@ -1,2 +1,9 @@
 *.pyc
 *swp
+bsrc/
+build/
+dist/
+include/
+lib/
+bin/
+MANIFEST*
