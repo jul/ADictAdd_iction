@@ -54,16 +54,15 @@ def objwalk(obj, path=(), limit=False, ):
         yield [x for x in flattening((path,  obj))]
 
 def iter_object(obj, path=(), **opt):
-    flatten = opt.get("flatten", False)
 
     if isinstance(obj, Mapping):
         for key, value in obj.iteritems():
             for child in iter_object(value, path + (key,), **opt):
                 yield  child
     else:
-        yield  flatten and [ 
-                x for x in flattening( path ) 
-            ] or path, obj   
+        yield  opt.get("flatten") and [ 
+                x for x in flattening( ( path, obj) ) 
+            ] or ( path, obj )
 
 class VectorDict(defaultdict):
     """DefaultDict with addition"""
@@ -111,14 +110,15 @@ class VectorDict(defaultdict):
         """
         return iter_object(self,(),flatten=False)
     
-    def as_row_iter(self, path=()): 
+    def as_row_iter(self, path=(), **arg): 
         """
         iterator on key value pair of nested dict yielding items in the form
         set( key0, key1, key2 , child)
         very useful for turning a dict in a row for a csv output
         all keys and values are flattened
         """
-        return iter_object(self,(),flatten=True)
+        arg["flatten"] = arg.get("flatten", True)
+        return iter_object(self,(),**arg )
 
     def divide(self, other):
         """multiplying to vectors as one vector of homothetia * vector
@@ -148,7 +148,7 @@ class VectorDict(defaultdict):
                 new_dict[k] = self[k] * other[k]
         return new_dict
     def dot(self, other):
-        """scalar  = sum items self * other 
+        """scalar  = sum items self * other for each distinct key in common
         norm of the projection of self on other"""
         return sum( [ 1.0 * v for k,v in ( self * other ).as_vector_iter()  ] )
     
@@ -156,6 +156,7 @@ class VectorDict(defaultdict):
     #    return ( v for k,v in self.as_vector_iter() )
 
     def norm(self):
+        """norm of a vector dict = sqrt( a . a  )"""
         return sqrt(self.dot(self))
 
     def cos( self, other ):

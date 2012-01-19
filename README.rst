@@ -29,10 +29,38 @@ as_row_iter
 
     from vector_dict import VectorDict
 
-    a = VectorDict( int, dict( x = 1, y = 1 ) )
-    b = VectorDict( int, dict( x = 1, y = 0 ) )
+    a = VectorDict( int, dict( x=1, y=1 ) )
+    
+    b = VectorDict( int, dict( x=1, y=0, z=0) )
+
+    a + b  
+    
+    # Out : defaultdict(<type 'int'>, {'y': 1, 'x': 2, 'z' : 0 })
+    
+    a * b
+
+    #Out : defaultdict(<class 'vector_dict.VectorDict'>, {'y': 0, 'x': 1})
+
+
     print a.cos(b) 
-    # should return sqrt(2) / 2 (acos(45°)
+
+    # Out : 0.7071067811865475 
+    
+    # sqrt(2) / 2 = acos(45°)
+
+    a.dot(b)
+
+    # Out : 1.0 
+    
+    a.norm()
+
+    # 1.4142135623730951
+
+    a.pprint()
+    
+    # u'y'=1
+    # u'x'=1
+
 
 
 Helpers
@@ -47,6 +75,7 @@ path to key in the form of a set of keys , value (leaf)
     a = VectorDict( int, dict( a=1, b = VectorDict(int, dict(c=1)))) 
     
     [ (k, v) for  k,v in a.as_vector_iter() ]
+    
     # Out: [(('a',), 1), (('b', 'c'), 1)]
  
 as_row_iter
@@ -56,10 +85,13 @@ obj ] ]
 used for instance to ready a dict for a csv 
     
     a = VectorDict( int, dict( a=1, b = VectorDict(int, dict(c=1)))) 
+
     [ e for  e in a.as_row_iter(flatten=False) ]
+    
     # Out : [(('a',), 1), (('b', 'c'), 1)]
 
     [ e for  e in a.as_row_iter(flatten=True) ]
+    
     # Out : [['a', 1], ['b', 'c', 1]]
 
 
@@ -70,6 +102,7 @@ Build an intricated dict from an array representing a flat array of keys
 ending by a value
 
     path_from_array( [ "a", "b" , 1 ])
+
     # Out : defaultdict(<class 'vector_dict.VectorDict'>, {'a': defaultdict(<class 'vector_dict.VectorDict'>, {'b': 1})})
 
 
