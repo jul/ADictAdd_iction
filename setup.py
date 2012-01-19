@@ -26,7 +26,7 @@ setup(
         author='Julien Tayon',
         author_email='julien@tayon.net',
         packages=['vector_dict'],
-        url='http://gitbug.com/jul/ADDict_Addiction',
+        url='https://github.com/jul/ADictAdd_iction/',
         license='LICENSE.txt',
         description='Implementing vector algebra on dict',
         long_description=open('README.rst').read(),
