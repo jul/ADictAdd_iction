@@ -1,4 +1,4 @@
-#env python
+#!env python
 # -*- coding: utf-8 -*-
 """
 playing with cos and dot product of dict
