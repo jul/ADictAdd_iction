@@ -1,0 +1,11 @@
+Todo :
+======
+
+* better documentation ; 
+* better formating more PEP* compliant ;
+* better consistency in object return (with * & + ) ;
+
+Releases:
+=========
+
+* 0.1.0 initial release
