@@ -31,7 +31,7 @@ setup(
         description='Implementing vector algebra on dict',
         long_description=open('README.rst').read(),
         requires=[
-        "collections",
+        "collections","math"
         ],
         classifiers=[
           'Development Status :: 4 - Beta',
