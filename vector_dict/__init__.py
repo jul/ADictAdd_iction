@@ -159,7 +159,15 @@ class VectorDict(defaultdict):
         return sqrt(self.dot(self))
 
     def cos( self, other ):
+        """cosine similarity of two vectors"""
         return 1.0 * self.dot( other) / self.norm() / other.norm()
+    def jackard(self, other):
+        """jackard similariry"""
+        return 1.0 * self.dot(other) / (
+            float( self.norm()) ** 2 +
+            float( other.norm()) ** 2-
+            self.dot(other) 
+        )
 
             
 
