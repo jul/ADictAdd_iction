@@ -1,10 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+"""Dict behaving like a vector, and supporting all operations
+the algebraic way
+"""
 from collections import defaultdict
 from collections import Sequence, Mapping
 from math import sqrt
 #WTFPL
-"""Overriding collections.DefaultDict to support addition """
 
 all = ['VectorDict', 'objwalk', 'path_from_array', 'flattening', 'can_be_walked']
 ##mouais le test sur list ou tuple quand on a du numpy.array ça sux
@@ -65,7 +67,8 @@ def iter_object(obj, path=(), **opt):
             ] or ( path, obj )
 
 class VectorDict(defaultdict):
-    """DefaultDict with addition"""
+    """Dict that supports all operations the way of vector does : 
+    + - / * dot, and operations with scalars"""
 
     def __init__(self, *a, **kw):
         """constructor"""
