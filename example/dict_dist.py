@@ -35,7 +35,7 @@ def closest( candidate ):
     
     print "better jaccard similarity : "
     print "%s/%r" % sorted(
-        [ (w, cand_vect.jackard(v)) for w, v in vectors.iteritems() ],
+        [ (w, cand_vect.jaccard(v)) for w, v in vectors.iteritems() ],
         key = lambda x: x[1], reverse=True
     )[0]
 
