@@ -32,28 +32,35 @@ def closest( candidate ):
     """ misc test of distance"""
     cand_vect = string_as_vect(candidate)
     print "** for the word <%s>" % candidate
+    
+    print "better jackard similarity : "
+    print "%s/%r" % sorted(
+        [ (w, cand_vect.jackard(v)) for w, v in vectors.iteritems() ],
+        key = lambda x: x[1], reverse=True
+    )[0]
+
 
     print "better cos : "
-    print "%r/%s" % sorted(
+    print "%s/%r" % sorted(
         [ (w, cand_vect.cos(v)) for w, v in vectors.iteritems() ],
         key = lambda x: x[1], reverse=True
     )[0]
 
     print "better projection relative to projected: "
-    print "%r/%s" % closest_to_one(
+    print "%s/%r" % closest_to_one(
         [ (w, cand_vect.dot(v) / ( v.norm() ** 2 ) ) 
             for w, v in vectors.iteritems() ],
         key = lambda x: x[1]
     )[0]
     
     print "better projection relative to candidate : "
-    print "%r/%s" % closest_to_one(
+    print "%s/%r" % closest_to_one(
         [ (w, cand_vect.dot(v) / ( cand_vect.norm() ** 2 ) ) 
             for w, v in vectors.iteritems() ],
         key = lambda x: x[1]
     )[0]
     print "least difference: "
-    print "%r/%s" % sorted(
+    print "%s/%r" % sorted(
         [ (w, (cand_vect - v).norm() / cand_vect.norm() ) for w, v in vectors.iteritems() ],
         key = lambda x: x[1],
 
