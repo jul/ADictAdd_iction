@@ -8,9 +8,18 @@ from collections import Sequence, Mapping
 from math import sqrt
 #WTFPL
 
-all = ['VectorDict', 'objwalk', 'path_from_array', 'flattening', 'can_be_walked']
+all = ['cos', 'dot', 'VectorDict', 'objwalk', 'path_from_array', 'flattening', 'can_be_walked']
 ##mouais le test sur list ou tuple quand on a du numpy.array ça sux
 ## puis si on peut le parcourir ça quake "__iter__"
+
+
+def dot( obj1, obj2):
+    """for ease of reading and writing"""
+    return obj1.dot(obj2)
+
+def cos( obj1, obj2):
+    """for ease of reading and writing"""
+    return obj1.cos(obj2)
 
 
 def path_from_array(path):
