@@ -6,10 +6,10 @@ from distutils.core import setup
 def test():
     """Specialized Python source builder."""
 
-    from vector_dict import VectorDict
-    from vector_dict.consistency import consistent_algebrae
+    from vector_dict.VectorDict import VectorDict
+    from  vector_dict.ConsistentAlgebrae import ConsistentAlgebrae
 
-    consistent_algebrae(
+    ConsistentAlgebrae(
         context="test",
         neutral=VectorDict(int, {}),
         one=VectorDict(int, {"one": 1, "one_and_two": 3}),
@@ -22,13 +22,13 @@ test()
 
 setup(
         name='VectorDict',
-        version='0.1.0',
+        version='0.2.0',
         author='Julien Tayon',
         author_email='julien@tayon.net',
         packages=['vector_dict'],
         url='https://github.com/jul/ADictAdd_iction/',
         license='LICENSE.txt',
-        description='Implementing vector algebra on dict',
+        description='Implementing vector algebra on tree (made of composed dict)',
         long_description=open('README.rst').read(),
         requires=[
         "collections","math"
@@ -36,7 +36,7 @@ setup(
         classifiers=[
           'Development Status :: 4 - Beta',
           'Intended Audience :: Developers',
-          'License :: OSI Approved :: WTFPL',
+          'License :: OSI Approved :: Python Software Foundation License',
           'Operating System :: MacOS :: MacOS X',
           'Operating System :: Microsoft :: Windows',
           'Operating System :: POSIX',
