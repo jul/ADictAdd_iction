@@ -171,7 +171,7 @@ class ConsistentAlgebrae(object):
                     pprint(self, method, res, left, right )
                 else:
                     praise(self, method, res, left, right)
- 
+        reinit_me.__doc__ = method.__doc__ 
         return reinit_me
 
     @fixture_and_test
