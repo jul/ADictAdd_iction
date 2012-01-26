@@ -6,9 +6,11 @@ the algebraic way
 from collections import defaultdict
 from collections import Sequence, Mapping
 from math import sqrt
+import types
 #WTFPL
 
-all = ['cos', 'dot',  'objwalk', 'path_from_array', 'flattening', 'can_be_walked']
+all = ['cos', 'dot',  'iter_object' , 'path_from_array', 
+    'flattening', 'can_be_walked']
 
 
 def dot( obj1, obj2):
@@ -18,6 +20,7 @@ def dot( obj1, obj2):
 def cos( obj1, obj2):
     """for ease of reading and writing"""
     return obj1.cos(obj2)
+
 
 
 def path_from_array(path):
@@ -32,15 +35,18 @@ def can_be_walked(stuff):
     """tells if it is walkable """
     return isinstance(stuff, list) or hasattr(stuff, "__iter__")
 
+def is_generator(stuff):
+    """tells if it is a generator"""
+    return isinstance(stuff, types.GeneratorType)
 
-def flattening(a_duck):
+def flattening(a_duck, taxonomy = can_be_walked ):
     """flattening stuff // adapted from python cookbook"""
-    if not can_be_walked(a_duck):
+    if not taxonomy(a_duck):
         yield a_duck
     else:
         for duckling in a_duck:
-            if can_be_walked(duckling) and not isinstance( duckling, str) :
-                for duck_eggs in flattening(duckling):
+            if taxonomy(duckling) and not isinstance( duckling, str) :
+                for duck_eggs in flattening(duckling, taxonomy = taxonomy):
                     yield duck_eggs
             else:
                 yield duckling
@@ -70,6 +76,12 @@ class VectorDict(defaultdict):
     """Dict that supports all operations the way of vector does : 
     + - / * dot, and operations with scalars"""
 
+    def flatten_generator(func):
+        def wrap(*a, **kw):
+            return flattening( func( *a, **kw ), taxonomy = is_generator )
+        wrap.__doc__ = func.__doc__
+        return wrap
+    
     def __init__(self, *a, **kw):
         """constructor"""
         defaultdict.__init__(self, *a, **kw)
@@ -83,7 +95,15 @@ class VectorDict(defaultdict):
         else:
             return left1.divide(left2)
    
-
+            
+    @flatten_generator
+    def find(self, predicate_on_path_value, path = [] ):
+        """apply a fonction on value if predicate on key is found"""
+        for k,v in self.iteritems():
+            if predicate_on_path_value(path + [k], v):
+                yield   path + [k] ,v
+            if isinstance(v, VectorDict ):
+                yield  v.find( predicate_on_path_value, path + [ k ]  )
 
     def __mul__(left1, left2, *a, **lw):
         """muler"""
@@ -319,6 +339,6 @@ if '__main__' == __name__:
     print "%r" % a
     print "****%r" % b
     a += b
-    for el in objwalk(a):
+    for el in iter_object(a):
         print "<%r>" % (el or "",)
     print "%r" % "-".join( [ repr(k) for k,v in a.as_vector_iter() ] )
