@@ -1,5 +1,6 @@
 include vector_dict/*py
 include example/*py
 include README
+include README.rst
 include CHANGES.txt
 include LICENSE.txt
