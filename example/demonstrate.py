@@ -5,8 +5,20 @@
 dict( { a : 1 } ) + dict(  { a : 2 } ) + dict( { b : 2 } )
 would be a practical for map reduce operations in nosql/large dataset
 (HDF5 iterators) like context. Je dis ça, je dis rien"""
+import os, sys, inspect
+cmd_folder = os.path.abspath(
+    os.path.join(
+        os.path.split(
+            inspect.getfile( inspect.currentframe() )
+        )[0] ,
+        ".."
+    )
+)
+if cmd_folder not in sys.path:
+   sys.path.insert(0, cmd_folder)
 
-from vector_dict import objwalk, VectorDict
+
+from vector_dict.VectorDict import iter_object,  VectorDict
 from csv import reader, writer
 import os
 from io import StringIO
@@ -41,7 +53,7 @@ w = writer(os.sys.stdout)
 print ""
 w.writerow(["langage", "how many users"])
 map(w.writerow,
-    objwalk(
+    iter_object(
         reduce(
             ## well that is a complex reduce operation :)
             VectorDict.__iadd__,
@@ -49,7 +61,8 @@ map(w.writerow,
                 lambda document: VectorDict(int, {document[LANGAGE]: 1}),
                 nosql_iterator(StringIO(mocking_nosql))
             )
-        )
+        ),
+        flatten = True
     )
 )
 """expected result :
@@ -66,7 +79,7 @@ print "\n" * 2 + "next test\n"
 ### Hum .... I miss a sort and a  limit by to be completely SQL like compatible
 w.writerow(["country", "langage", "coolness", "howmany"])
 map(w.writerow,
-    objwalk(
+    iter_object(
         ##nosql like reduce
         reduce(
             ## well that is the same very complex reduce operation :)
@@ -109,7 +122,8 @@ map(w.writerow,
                     nosql_iterator(StringIO(mocking_nosql))
                 )
             )
-        )
+        ),
+            flatten = True
     )
 )
 """expected result :

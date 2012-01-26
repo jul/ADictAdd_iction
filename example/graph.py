@@ -20,11 +20,23 @@ I used pydot to make a svg map of the path / frequency, just for fun
 """
 
 
+import os, sys, inspect
+cmd_folder = os.path.abspath(
+    os.path.join(
+        os.path.split(
+            inspect.getfile( inspect.currentframe() )
+        )[0] ,
+        ".."
+    )
+)
+if cmd_folder not in sys.path:
+   sys.path.insert(0, cmd_folder)
+
 
 
 
 import re
-from vector_dict import VectorDict, path_from_array, flattening
+from vector_dict.VectorDict import VectorDict, path_from_array, flattening
 import pydot as pd
 from codecs import open as open
 
@@ -33,9 +45,8 @@ def dot_graph( dict_graph, out_name, gopts = dict( fontsize = 20.0, size = "100.
     node = set()
     edge = []
     label = [] 
-    for pair in dict_graph.as_row_iter():
-        
-        path = [ "ROOT" ] +  pair[0] + list( [ pair[1] ] )  
+    for pair in dict_graph.as_row_iter(flatten=False):
+        path = [ "ROOT" ] +  list(pair[0]) + list( [ pair[1] ] )  
         ## on vire weigth
         path.pop(-2) 
         node = node | set( x for x in flattening(path)  )
@@ -107,7 +118,7 @@ print text_grapher(t4).cos(text_grapher(t5))
 
 
 mysogine = text_grapher( open("myso-fr.txt","rt",encoding= "utf-8" ).read() )
-#mysogine.pprint()
+mysogine.pprint()
 dot_graph( mysogine, "mysogine.svg")
 
 

@@ -1,4 +1,4 @@
-#!env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -11,8 +11,20 @@ on the norm of the reference, the closest to one are best fits
 difference : each vectors are substracted and we compare the norms
 
 """
+import os, sys, inspect
+cmd_folder = os.path.abspath(
+    os.path.join(
+        os.path.split(
+            inspect.getfile( inspect.currentframe() )
+        )[0] ,
+        ".."
+    )
+)
+if cmd_folder not in sys.path:
+   sys.path.insert(0, cmd_folder)
 
-from vector_dict import VectorDict
+
+from vector_dict.VectorDict import VectorDict
 
 
 def closest_to_one(a_list, **arg):
