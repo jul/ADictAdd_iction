@@ -9,9 +9,54 @@ from math import sqrt
 import types
 #WTFPL
 
-all = ['cos', 'dot',  'iter_object' , 'path_from_array', 
-    'flattening', 'can_be_walked']
+all = ['cos', 'dot',  'iter_object' , 'tree_from_path', 'path',
+    'flattening', 'can_be_walked', "is_leaf"]
 
+def is_leaf(item):
+    return not isinstance(item, dict) 
+
+def convert_tree(a_tree):
+    """
+    convert from any other nested object to a VectorDict 
+    works very well with nested dict
+    Dont work as a method (why ?)
+    """
+    a_vector_dict = VectorDict()
+
+    for e in iter_object_nl(a_tree, flatten = True):
+        a_vector_dict += tree_from_path( e )
+    return a_vector_dict
+
+class Path(  list):
+    def endswith( self, a_tuple ):
+        return self[len(self) - len(a_tuple) : ] == a_tuple
+
+    def startswith( self, a_tuple ):
+        return self[: len( a_tuple ) ] == a_tuple
+
+    def contains( self, a_tuple, _from = 0, follow = 0):
+        if len( a_tuple) == follow:
+            return True
+        index = False
+        try:
+            here = self[ _from:]
+            if len(here ) < len(a_tuple[follow:]):
+                return False
+        except IndexError:
+            return False
+
+        try:
+            index = here.index(a_tuple[follow] )
+            return  self.contains(
+                    a_tuple, 
+                        index +  1 , 
+                        follow + 1
+                    )
+        except ValueError:
+            return False
+        except IndexError:
+            return self.contains(a_tuple, _from +  1 )
+        return False
 
 def dot( obj1, obj2):
     """for ease of reading and writing"""
@@ -23,13 +68,14 @@ def cos( obj1, obj2):
 
 
 
-def path_from_array(path):
+def tree_from_path(path):
     """adding a path to a vector"""
     path_to_key = list(path)
-    current = VectorDict( VectorDict, { path_to_key.pop() : path_to_key.pop()})
+    root = VectorDict( VectorDict, { path_to_key.pop() : path_to_key.pop()})
+    current = root
     while len(path_to_key):
         current = VectorDict( VectorDict, { path_to_key.pop() : current})
-    return current 
+    return current
 
 def can_be_walked(stuff):
     """tells if it is walkable """
@@ -53,6 +99,23 @@ def flattening(a_duck, taxonomy = can_be_walked ):
 
 
 
+def iter_object_nl(obj, path=(), **opt):
+    """
+    Generator on all leaves of the object, return an array of the path and the
+    leaf
+
+    source:
+     http://tech.blog.aknin.name/2011/12/11/walking-python-objects-recursively/
+    """
+
+    if isinstance(obj, Mapping):
+        for key, value in obj.iteritems():
+            for child in iter_object_nl(value, path + (key,), **opt):
+                yield  child
+    else:
+        yield  opt.get("flatten") and  [
+                x for x in flattening(  path)  
+            ] + [   obj ]  or ( path, obj )
 
 def iter_object(obj, path=(), **opt):
     """
@@ -76,12 +139,101 @@ class VectorDict(defaultdict):
     """Dict that supports all operations the way of vector does : 
     + - / * dot, and operations with scalars"""
 
+    def from_tree( self, a_tree):
+        self =  convert_tree( a_tree)
+
+    def add_path(self, path):
+        self.__add__( tree_from_path( path ) )
+
+    def build_path( self, *path):
+        print "%r %r" % (self, path) 
+        if len(path) == 2:
+            key, value = path[0:2]
+            if self[key] != value:
+                raise Exception("Collision for path %r %r != %r" % ( path, key, value))
+        if len(path)> 2:
+            key, value = path[0:2]
+            if self.get(key):
+                if  value == self[key]  :
+                    self[key].build_path( path[1:] )
+
+            else:
+            ###SETITEM
+                self = tree_from_path( path )
+
+    def prune(self, path):
+        """delete all items at the path"""
+        if len(path)>1:
+            self.at(path[:-1]).__delitem__(path[-1])
+        else:
+            self.__delitem__( path[0] )
+
+    def at(self, path, apply_here = None, copy = False):
+        """
+        gets to the mentioned path eventually apply a lambda on the value
+        and return the node, 
+        """
+        here = self
+        for e in path[:-1]:
+            if not here.get(e):
+                raise Exception("Obob")
+            here = here[e]
+        if not apply_here is None:
+            here.__setitem__(path[-1],apply_here(here[path[-1]]))
+        return here[path[-1]] 
+
+
     def flatten_generator(func):
         def wrap(*a, **kw):
-            return flattening( func( *a, **kw ), taxonomy = is_generator )
+            return flattening( func( *a, **kw ), taxonomy = is_generator ) 
         wrap.__doc__ = func.__doc__
         return wrap
-    
+
+    #@flatten_generator
+    def diff(self, other, diff_mine = None,diff_other=None, path = []):
+        def prune( key, adict):
+            def todo():
+                adict.__delitem__(key)
+            return [ todo ]
+
+        def cp_if_dict(val):
+            return isinstance( v, dict) and v.copy() or v
+        if not diff_mine:
+            diff_mine = VectorDict( VectorDict, {} )
+            diff_other = VectorDict( VectorDict, {} )
+        for k, v in self.iteritems():
+            if not k  in other.keys():
+            ## pour que l'autre me ressemble enlevons toutes les clés
+                diff_other += tree_from_path(  path + [k, prune( k, self)  ] )
+            else:
+                ## k in other.keys()
+                ## les clés sont dans les deux arbres
+                if v != other[k] :
+                    if isinstance( v , VectorDict) and isinstance( 
+                        other[k], VectorDict):
+                        vd_m, vd_o = v.diff(  other[k],  diff_mine, diff_other,  path + [ k ] )
+                        diff_mine = diff_mine + vd_m
+                        diff_other = diff_other + vd_o
+                    elif isinstance( v , VectorDict) or isinstance( 
+                        other[k], VectorDict):
+                        diff_mine +=  tree_from_path(  path + [k, cp_if_dict( other[k]) ] )
+                    else: 
+                        diff_mine +=  tree_from_path( path + [k, - other[k]    ] )
+
+                
+                else:
+                    if isinstance( v, VectorDict ):
+                        vd_m, vd_o = v.diff(  other[k],  diff_mine, diff_other,  path + [ k ] )
+                        diff_mine = diff_mine + vd_m
+                        diff_other = diff_other + vd_o
+                    
+        for k , v in other.iteritems():
+            if not k  in self.keys():
+                diff_mine += tree_from_path( path + [k, v ] )
+
+        return diff_mine, diff_other
+               
+
     def __init__(self, *a, **kw):
         """constructor"""
         defaultdict.__init__(self, *a, **kw)
@@ -95,15 +247,17 @@ class VectorDict(defaultdict):
         else:
             return left1.divide(left2)
    
-            
+        
     @flatten_generator
     def find(self, predicate_on_path_value, path = [] ):
         """apply a fonction on value if predicate on key is found"""
+        path = Path( path )
         for k,v in self.iteritems():
-            if predicate_on_path_value(path + [k], v):
-                yield   path + [k] ,v
+            if predicate_on_path_value(Path( path + [k]), v):
+                yield  Path( path + [k])  ,v 
             if isinstance(v, VectorDict ):
-                yield  v.find( predicate_on_path_value, path + [ k ]  )
+                yield    v.find( predicate_on_path_value, Path( path + [ k ] ) )
+                 
 
     def __mul__(left1, left2, *a, **lw):
         """muler"""
@@ -260,7 +414,7 @@ class VectorDict(defaultdict):
 
     def pprint(self):
         print "\n".join( [ 
-                    "%r=%r" % (
+                    "%s=%r" % (
                         "->".join( map(unicode, k)), 
                         v
                     ) for k, v in self.as_vector_iter() ] )
@@ -275,7 +429,8 @@ class VectorDict(defaultdict):
                 bigger[k] += v
             else:
                 bigger[k] = v
-        return bigger
+        left1 = bigger.copy()
+        return left1
         
     def __iadd__(self, other):
         """adder"""
