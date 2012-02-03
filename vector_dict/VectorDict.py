@@ -138,35 +138,64 @@ def iter_object(obj, path=(), **opt):
 class VectorDict(defaultdict):
     """Dict that supports all operations the way of vector does : 
     + - / * dot, and operations with scalars"""
+    def __init__(self, *a , **a_dict ):
+        
+        super( VectorDict, self).__init__( *a,**a_dict)
 
     def from_tree( self, a_tree):
         self =  convert_tree( a_tree)
 
     def add_path(self, path):
-        self.__add__( tree_from_path( path ) )
+        """ same as buildpath other implementation, 
+        I need to make test, this one seems less interesting"""
+        self += tree_from_path( path)
+        self.__setitem__(path[0],self[path[0]])
+        ### fighting against amnesia
 
+
+                
+                
     def build_path( self, *path):
-        print "%r %r" % (self, path) 
+        """ implementation of constructing a path in a tree"""
+        if isinstance(path[0], list):
+            path = path[0]
         if len(path) == 2:
             key, value = path[0:2]
-            if self[key] != value:
-                raise Exception("Collision for path %r %r != %r" % ( path, key, value))
-        if len(path)> 2:
+            if  key in self.keys() and self.get(key) != value:
+                self[key]+=value
+            self.__setitem__( key, value )
+        if len(path) > 2:
             key, value = path[0:2]
-            if self.get(key):
-                if  value == self[key]  :
-                    self[key].build_path( path[1:] )
-
+            if key in self.keys() and self.get(key):
+                if  value in self[key].keys():
+                    self[key].build_path( path[1:])
             else:
             ###SETITEM
-                self = tree_from_path( path )
+                if key in self.keys():
+                    raise Exception("Path already present")
+                self.__setitem__( key,  tree_from_path( path[1:] ))
+    
+    def path_pop(self, path):
+        """ return the element designated by the path, and then prune it
+        from the dict"""
+        if path is None or path is  0:
+            raise Exception("dict have no orders, so provide a path to pop")
 
-    def prune(self, path):
-        """delete all items at the path"""
+
+        self.prune( path, pop = True )
+
+    def prune(self, path, pop = False):
+        """delete all items at path """
         if len(path)>1:
             self.at(path[:-1]).__delitem__(path[-1])
         else:
             self.__delitem__( path[0] )
+            if pop: return path[0]
+
+    def push(self, path, value ):
+        """ pushing value at place given by path
+        will create the path if inexistent"""
+        self.build_path( path + [ v ] )
 
     def at(self, path, apply_here = None, copy = False):
         """
@@ -176,7 +205,7 @@ class VectorDict(defaultdict):
         here = self
         for e in path[:-1]:
             if not here.get(e):
-                raise Exception("Obob")
+                raise Exception("Path %r does not exists in the tree" %path ) 
             here = here[e]
         if not apply_here is None:
             here.__setitem__(path[-1],apply_here(here[path[-1]]))
@@ -234,9 +263,6 @@ class VectorDict(defaultdict):
         return diff_mine, diff_other
                
 
-    def __init__(self, *a, **kw):
-        """constructor"""
-        defaultdict.__init__(self, *a, **kw)
 
     def __div__(left1, left2, *a, **lw):
         """dict by dict division"""
@@ -426,25 +452,22 @@ class VectorDict(defaultdict):
         smaller = left1_big and left2 or left1
         for k, v in smaller.iteritems():
             if k in bigger.keys():
-                bigger[k] += v
+                bigger.__setitem__(k, bigger[k] + v )
             else:
-                bigger[k] = v
-        left1 = bigger.copy()
-        return left1
-        
+                bigger.__setitem__(k,  v)
+        return bigger
+    
     def __iadd__(self, other):
-        """adder"""
-        self = self.__add__(other)
-        return self
-        #print "self %r" % self
+#        print "self %r" % self
+#        self = self + other
         #print "other %r" % other
-
-        #for k, v in other.iteritems():
-        #    if k in self.keys():
-        #        self[k] +=  v
-        #    else:
-        #        self[k] = v
+        for k, v in other.iteritems():
+            if k in self.keys():
+                self[k] +=  v
+            else:
+                self.__setitem__(k, v)
         #print "self %r" % self
+        return self
 
 if '__main__' == __name__:
     print "undestranding 2 * array"
@@ -493,6 +516,7 @@ if '__main__' == __name__:
           )
     print "%r" % a
     print "****%r" % b
+    b.pprint()
     a += b
     for el in iter_object(a):
         print "<%r>" % (el or "",)
