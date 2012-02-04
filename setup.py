@@ -28,7 +28,7 @@ setup(
         packages=['vector_dict'],
         url='https://github.com/jul/ADictAdd_iction/',
         license='LICENSE.txt',
-        description='Implementing vector algebra on tree (made of composed dict)',
+        description='Implementing vector algebra on tree',
         long_description=open('README.rst').read(),
         requires=[
         "collections","math"

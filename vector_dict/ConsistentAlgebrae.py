@@ -11,19 +11,8 @@ Mainly the tests are coming out of a math book
 
 from copy import deepcopy
 
-import os, sys, inspect
-cmd_folder = os.path.abspath(
-    os.path.join(
-        os.path.split(
-            inspect.getfile( inspect.currentframe() )
-        )[0] ,
-        ".."
-    )
-)
-if cmd_folder not in sys.path:
-   sys.path.insert(0, cmd_folder)
 
-from vector_dict.VectorDict import can_be_walked, VectorDict
+from VectorDict import can_be_walked, VectorDict
 
 def try_copy_or_copy(self, src, dst):
     copy = None
@@ -308,6 +297,17 @@ class ConsistentAlgebrae(object):
 
 if '__main__' == __name__:
 
+    import os, sys, inspect
+    cmd_folder = os.path.abspath(
+        os.path.join(
+            os.path.split(
+                inspect.getfile( inspect.currentframe() )
+            )[0] ,
+            "."
+        )
+    )
+    if cmd_folder not in sys.path:
+       sys.path.insert(0, cmd_folder)
 
     try:
         from numpy import array as array

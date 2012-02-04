@@ -36,7 +36,7 @@ if cmd_folder not in sys.path:
 
 
 import re
-from vector_dict.VectorDict import VectorDict, path_from_array, flattening
+from vector_dict.VectorDict import VectorDict, tree_from_path, flattening
 import pydot as pd
 from codecs import open as open
 
@@ -77,7 +77,7 @@ def path_collider(vector, path):
     path_copy = list(path)
     if not isinstance( vector, VectorDict):
         if len(vector):
-            vector = path_from_array( vector + [ "weight" , 1 ])
+            vector = tree_from_path( vector + [ "weight" , 1 ])
         else:
             vector = VectorDict( VectorDict, dict() )
     current = vector
@@ -92,7 +92,7 @@ def path_collider(vector, path):
             path = [ current_key ] + path
             break
     if len(path):
-        vector += path_from_array( path_copy + [ "weight" , 1 ] )
+        vector.add_path( path_copy + [ "weight" , 1 ] )
     return vector 
 
 def text_grapher(unicode_text):
