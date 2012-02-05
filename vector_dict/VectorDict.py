@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Dict behaving like a vector, and supporting all operations
 the algebraic way
@@ -7,7 +7,7 @@ from collections import defaultdict
 from collections import Sequence, Mapping
 from math import sqrt
 import types
-from  clause import Clause, is_leaf, is_container
+from  Clause import Clause, is_leaf, is_container, is_function
 #WTFPL
 
 __all__ = ['cos', 'dot',  'iter_object' , 'tree_from_path', 'Path',
@@ -151,20 +151,35 @@ class VectorDict(defaultdict):
         for k,v in a_tree.iteritems():
             if k in self:
                 if is_leaf(v):
-                    if isinstance(v, types.FunctionType):
+                #terminaison of the comparison tree
+                    if isinstance(
+                            v, Clause
+                        ) or isinstance( 
+                            v , types.FunctionType
+                        ):
+                    # if it is a clause apply it to the targeted tree
                         match_to_find -= v(self.get(k)) and 1 or 0
                     else:
+                    ## it is not a clause
                         val = self.get(k)
                         if  is_leaf(val):
+                        ## terminating values match
                             match_to_find -= v ==  val and 1 or 0
                         else:
+                        ## the compared tree goes on, we match the keys
                             match_to_find -=  v in val  and 1 or 0
                 else:
+                    ## the comparison tree goes on
                     sub_tree = self.get(k)
                     if not is_leaf(sub_tree):
+                        ## the compared tree goes on 
+                        ## we recurse
                         match_to_find -= sub_tree.match_tree( v ) and 1 or 0
                     else:
+                        ### the compared tree is smaller than the comparison 
+                        ## tree
                         match_to_find -= v ==sub_tree and 1 or 0 
+                        #return False
         return 0 == match_to_find
 
     def add_path(self, path):
@@ -179,8 +194,8 @@ class VectorDict(defaultdict):
         """ implementation of constructing a path in a tree"""
         if len(path) == 2:
             key, value = path[0:2]
-            if  key in self.keys() and self.get(key) != value:
-                raise Exception( "collision of values")
+            if  key in self.keys() or self.get(key):
+                raise ValueError( "collision of values")
             self.__setitem__( key, value )
         if len(path) > 2:
             key, value = path[0:2]
@@ -190,8 +205,7 @@ class VectorDict(defaultdict):
             else:
                 if key in self.keys():
                     raise Exception("Path already present")
-                self.__setitem__( key,  tree_from_path( path[1:] ))
-    
+            self.__setitem__( key,  tree_from_path( path[1:] ))
 
     def prune(self, *path):
         """delete all items at path """
@@ -215,6 +229,8 @@ class VectorDict(defaultdict):
         and return the node, 
         """
         here = self
+        if apply_here and not( is_function(apply_here) ):
+            raise Exception("second argument must be a function to apply on path")
         if not len(path):
             if apply_here:
                 raise Exception("cant apply a function on root of %r" % self)
@@ -222,12 +238,18 @@ class VectorDict(defaultdict):
                 return  self.copy() 
             return   self
         for e in path[:-1]:
-            if not here.get(e):
+            if not hasattr(here, "__getitem__"):
+                raise IndexError("this path dont exists")
+            if not here.__getitem__(e):
                 raise Exception("Path %r does not exists in the tree" %path ) 
-            here = here[e]
+            here = here.__getitem__(e)
         if not apply_here is None:
             here.__setitem__(path[-1],apply_here(here[path[-1]]))
-        return here[path[-1]] 
+        value = here[path[ -1 ] ]
+
+        if copy and is_container(value):
+            return here[path[-1]].copy()
+        return value
 
 
     def flatten_generator(func):
@@ -291,7 +313,6 @@ class VectorDict(defaultdict):
         else:
             return left1.divide(left2)
    
-        
     @flatten_generator
     def find(self, predicate_on_path_value, path = [] ):
         """apply a fonction on value if predicate on key is found"""

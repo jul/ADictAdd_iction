@@ -3,9 +3,11 @@ import sys
 sys.path += [os.path.dirname( sys.modules[__name__].__file__) + os.sep + '..'  ]
 print sys.path[-1]
 
-from hack import *
 import unittest
 from VectorDict import VectorDict, convert_tree
+from Clause import is_leaf, has_type, is_container, anything
+from Operation import mul, cast
+
 class TestVectorDict(unittest.TestCase):
     
     def setUp(self):
@@ -34,10 +36,40 @@ class TestVectorDict(unittest.TestCase):
     def test_add_exists(self):
         self.easy += dict( x = 1 )
         self.assertEqual( self.easy['x'] , 2 )
-    def test_clause(self):
+    def test_clause_has_type(self):
         self.assertEqual( 
             has_type(float)(3.0), 
             True)
+    def test_is_leaf(self):
+        """ we need a is_leaf more specialized must have a bug somewhre
+        in find / match_tre
+        TODO have one that tells is not vector_dict
+        """
+        self.assertEqual(
+            all( [ is_leaf(e) for e in [ 
+                set(), 
+                frozenset(),
+                list(),
+                (e for e in range(0,10)),
+                3.0,
+                2,
+                False,
+                "ljlkjkl",
+                ]]),
+         True
+         )
+    def test_is_container(self):
+        self.assertEqual(
+            all( [ is_container(e) for e in [ 
+                dict(), 
+                set(), 
+                frozenset(),
+                list(),
+                VectorDict(bool, {}),
+                (e for e in range(0,10))
+                ]]),
+         True
+         )
     def test_match_tree(self):
         self.assertEqual( 
             self.cplx["b"].match_tree( dict( c= 3.0 ,d = dict( e = True) )),
@@ -67,6 +99,60 @@ class TestVectorDict(unittest.TestCase):
                 )
             ))  ][0][0], ['b'])
 
+        
+    def test_collision_build_path(self):
+        self.assertRaises(
+            ValueError,
+            self.easy.build_path,  'z' , 1  )
+    
             
+    def test_collision_build_path2(self):
+        self.assertRaises(
+            ValueError,
+            self.cplx.build_path,  'b' , 1  )
+    
+    def test_build_path(self):
+        self.cplx.build_path(  'b' , "new",  "whatever"  )
+        self.assertEqual( 
+            self.cplx["b"]["new"],
+            "whatever")
+            
+    def test_add_path(self):
+        self.cplx.add_path( [  'b' , "new",  "whatever"]  )
+        self.cplx.add_path( [  'b' , "new",  "whatever"]  )
+        self.assertEqual( 
+            self.cplx["b"]["new"],
+            "whatever" * 2 )
+    
+    def test_at1(self):
+        self.assertRaises( 
+            IndexError,
+            self.cplx.at, [ 'a', 'b', 'c' ] )
+    
+    def test_at2_and_ope_mul(self):
+        self.assertEqual( 
+            self.cplx.at( [ 'b','c' ]) ,
+            3.0
+        )
+    
+    def test_at3_and_ope_mul(self):
+        self.assertEqual( 
+            self.cplx.at( [ 'b','c' ], mul(-1) ),
+            -3.0
+        )
+    
+    def test_at4(self):
+        self.assertRaises( 
+            Exception,
+            self.cplx.at,  'a', 'b', 'c'  )
+    
+    def test_at5_copy(self):
+        """not sure I ever used it"""
+        self.assertIsNot( 
+            self.cplx.at( [ 'b' ], None, True ),
+            self.cplx["b"]
+        )
+    
+    
 if __name__ == '__main__':
     unittest.main(verbosity=2)
