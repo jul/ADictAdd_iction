@@ -2,7 +2,7 @@
 Convention :
 ============
 
-v *x* . *y*.*z*
+version x.y.z
 
 - *x* = API change
 - *y* = improvement
