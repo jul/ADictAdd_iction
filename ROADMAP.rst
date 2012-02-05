@@ -1,16 +1,19 @@
-============
+=======
+Roadmap
+=======
+
+
 Convention :
-============
+************
 
 version x.y.z
 
-- *x* = API change
-- *y* = improvement
-- *z* = bugfix
+- **x** = API change
+- **y** = improvement
+- **z** = bugfix
 
-==========================
 Path to world domination :
-==========================
+**************************
 
 v 0.3.0
     adding some easy features
@@ -32,9 +35,8 @@ v 1.0.0
     nice example and polishing
     I level up in python MMORPG and acquire skill «packaging» \o/ 
 
-==================
 Personnal wishlist 
-==================
+******************
 
 coding set operations on vectordict : 
 -------------------------------------
