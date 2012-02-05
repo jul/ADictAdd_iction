@@ -152,7 +152,11 @@ class TestVectorDict(unittest.TestCase):
             self.cplx.at( [ 'b' ], None, True ),
             self.cplx["b"]
         )
-    
+    def test_get_at(self):
+        self.assertIs(
+            self.cplx.at( ['b', 'c' ] ),
+            self.cplx.get_at( 'b' , 'c' )
+    )
     
 if __name__ == '__main__':
     unittest.main(verbosity=2)
