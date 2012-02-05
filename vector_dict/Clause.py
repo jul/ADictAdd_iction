@@ -18,6 +18,8 @@ class Clause(object):
         self.__opt = kw or None
 
 find_re = Clause( lambda pattern : lambda v: not re.search(pattern,str(v)) is None ) 
+"""Find if something match a regular expression"""
+
 is_container = Clause(lambda v : isinstance(v, list) or hasattr(v, "__iter__"))
 is_leaf = Clause(lambda v : not isinstance(v, dict))
 has_type = Clause(lambda _type : lambda v :  isinstance(v,_type))

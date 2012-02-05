@@ -4,7 +4,7 @@
 the algebraic way
 """
 import types
-from clause import Clause, is_leaf, is_container
+from Clause import Clause, is_leaf, is_container
 
 from VectorDict import VectorDict, Path, tree_from_path
 from collections import namedtuple, defaultdict
@@ -47,7 +47,7 @@ class SparseMatrix(VectorDict):
                 real_func = funct
             
             dst.build_path(   
-                *( list(coord.dst) + [ real_func( src.get_at( coord.src) ) ]) 
+                *( list(coord.dst) + [ real_func( src.at( coord.src) ) ]) 
             )
         return dst
 
@@ -56,17 +56,18 @@ if '__main__' == __name__:
     from Operation import  identity, mul, cast
     a = convert_tree( { 'a' : { 'b' : 1 , 'c' : 2 } , 'b' : 0 } )
     a.pprint()
-    print a.at( tuple( [ 'a', 'c' ] ) )
+    print a.at( [ 'a', 'c' ]  )
     m = SparseMatrix( 
         ( tuple( [ 'a', 'b' ] ), tuple([ 'mul', 'neg2' ] ), mul(-2) ),
         ( tuple([ 'a', 'c' ]), tuple([ 'mul', 'misplaced' ]), cast(float) ),
         ( tuple([ 'b' ])  , tuple([ 'a' ]) , lambda x : -4 ),
         ( tuple( [ 'a' ] ), tuple( [ 'a_dict' ] ), identity ),
         )
-    print "**************"
     m.pprint()
+    print "**************"
+    print m(a)
     m(a).pprint()
-    
+    print "iiiiiiiiiiiiiiiiiiiiiiiiiiiii" 
     w = SparseMatrix()
     w[ 
         Coordinates( src= tuple( [ ] ) , 

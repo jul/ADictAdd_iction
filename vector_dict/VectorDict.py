@@ -142,9 +142,17 @@ class VectorDict(defaultdict):
         super( VectorDict, self).__init__( *a,**a_dict)
 
     def from_tree( self, a_tree):
+        """Create a VectorDict Intrication from a tree
+        Drawback there is no factory specified
+        """
         self =  convert_tree( a_tree)
 
     def match_tree(self, a_tree):
+        """does the tree given ha an argument match the actual 
+        tree.
+        if tree leaves are Clauses, the match_tree will apply 
+        the clauses.
+        """
         match_to_find = len(a_tree.keys())
         if not set(a_tree).issubset( set(self.keys())):
             return False
@@ -191,7 +199,8 @@ class VectorDict(defaultdict):
 
 
     def build_path( self, *path):
-        """ implementation of constructing a path in a tree"""
+        """ implementation of constructing a path in a tree, argument is 
+        a serie of key """
         if len(path) == 2:
             key, value = path[0:2]
             if  key in self.keys() or self.get(key):
@@ -220,13 +229,16 @@ class VectorDict(defaultdict):
         will create the path if inexistent"""
         self.build_path( path + [ v ] )
 
-    def get_at(self, path):
+    def get_at(self, *path):
+        """ get element at path given has a serie of key"""
         return self.at( path, None , True)
 
     def at(self, path, apply_here = None, copy = False):
         """
         gets to the mentioned path eventually apply a lambda on the value
         and return the node, 
+        and copy it if mentioned. 
+        
         """
         here = self
         if apply_here and not( is_function(apply_here) ):
@@ -252,7 +264,7 @@ class VectorDict(defaultdict):
         return value
 
 
-    def flatten_generator(func):
+    def __flatten_generator(func):
         def wrap(*a, **kw):
             return flattening( func( *a, **kw ), taxonomy = is_generator ) 
         wrap.__doc__ = func.__doc__
@@ -313,7 +325,7 @@ class VectorDict(defaultdict):
         else:
             return left1.divide(left2)
    
-    @flatten_generator
+    @__flatten_generator
     def find(self, predicate_on_path_value, path = [] ):
         """apply a fonction on value if predicate on key is found"""
         path = Path( path + [] )
