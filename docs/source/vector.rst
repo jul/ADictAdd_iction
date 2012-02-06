@@ -2,8 +2,7 @@
 Vector Dict
 ===========
 
-Intro
-*****
+
 
 .. automodule:: vector_dict.VectorDict
 
@@ -16,5 +15,18 @@ API
 exemples
 ********
 
-exemple 1 
----------
+Making summation in jquery like structures
+------------------------------------------
+
+.. literalinclude:: ../../example/demonstrate.py
+   :lines: 20-
+
+
+Selecting item in a tree
+------------------------
+
+.. literalinclude:: ../../example/test_match.py
+
+
+
+

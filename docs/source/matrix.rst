@@ -1,3 +1,6 @@
+.. _matrix-label:
+   
+
 =============
 Sparse Matrix
 =============
@@ -10,4 +13,11 @@ API
 .. autoclass:: vector_dict.SparseMatrix.SparseMatrix
     :members:
 
+
+
+Example
+*******
+
+.. literalinclude:: ../../example/matrix.py
+   :lines: 18-
 

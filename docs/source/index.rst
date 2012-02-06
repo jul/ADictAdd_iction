@@ -11,6 +11,7 @@ Contents:
 
 .. toctree::
     intro
+    consistent
     vector
     matrix
     cl_op
