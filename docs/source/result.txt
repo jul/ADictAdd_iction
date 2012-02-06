@@ -1,0 +1,344 @@
+
+**************************************************
+
+testing for  'ndarray' class
+
+ a = array([1, 2, 3])
+ b = array([ 3,  4, -1])
+ c = array([5, 2, 3])
+ an_int = 3 
+ other_scalar = 4 
+ neutral element for addition is array([0, 0, 0]) 
+
+**************************************************
+
+test #1
+ a + b = b + a 
+test_commutativity is ok
+
+test #2
+ a + neutral = a 
+test_neutral is ok
+
+test #3
+ 1 * a = a 
+test_multiplicative_identity is ok
+
+test #4
+ an_int * a = a + ... + a (n times ) 
+test_scalar_multiplication is ok
+
+test #5
+ an_int * a = a * an_int 
+test_scalar_commutativity is ok
+
+test #6
+ -a = -1 * a 
+test_negative is ok
+
+test #7
+ ( an_int *  other_scalar ) * a = an_int ( other_scalar * a )
+test_associativity_scalar_multiplication is ok
+
+test #8
+ ( an_int + other_scalar ) a = an_int * a  + other_scalar * a 
+test_multiply_scalar_associativity is ok
+
+test #9
+( a + b )  + c  = a + ( b + c )
+test_associativity is ok
+
+test #10
+ a - b = a + ( -1 * b) 
+test_substraction is ok
+
+test #11
+ an_int ( a + b) = an_int *a + an_int * b 
+test_distributivity is ok
+
+test #12
+sum of the parts = sum of the total
+conservation is ok
+
+test #13
+sum of the differences == differences of the sum
+conservation_neg is ok
+**************************************************
+
+<type 'numpy.ndarray'> respects the algebraic acceptation of addition
+
+**************************************************
+
+**************************************************
+
+testing for  'int' class
+
+ a = 1
+ b = 2
+ c = 3
+ an_int = 3 
+ other_scalar = 4 
+ neutral element for addition is 0 
+
+**************************************************
+
+test #1
+ a + b = b + a 
+test_commutativity is ok
+
+test #2
+ a + neutral = a 
+test_neutral is ok
+
+test #3
+ 1 * a = a 
+test_multiplicative_identity is ok
+
+test #4
+ an_int * a = a + ... + a (n times ) 
+test_scalar_multiplication is ok
+
+test #5
+ an_int * a = a * an_int 
+test_scalar_commutativity is ok
+
+test #6
+ -a = -1 * a 
+test_negative is ok
+
+test #7
+ ( an_int *  other_scalar ) * a = an_int ( other_scalar * a )
+test_associativity_scalar_multiplication is ok
+
+test #8
+ ( an_int + other_scalar ) a = an_int * a  + other_scalar * a 
+test_multiply_scalar_associativity is ok
+
+test #9
+( a + b )  + c  = a + ( b + c )
+test_associativity is ok
+
+test #10
+ a - b = a + ( -1 * b) 
+test_substraction is ok
+
+test #11
+ an_int ( a + b) = an_int *a + an_int * b 
+test_distributivity is ok
+**************************************************
+
+<type 'int'> respects the algebraic acceptation of addition
+
+**************************************************
+
+**************************************************
+
+testing for  'list' class
+
+ a = [1]
+ b = [2]
+ c = [42]
+ an_int = 3 
+ other_scalar = 4 
+ neutral element for addition is [] 
+
+**************************************************
+
+test #1
+ a + b = b + a 
+test_commutativity is ko
+[2, 1] != [1, 2] 
+
+test #2
+ a + neutral = a 
+test_neutral is ok
+
+test #3
+ 1 * a = a 
+test_multiplicative_identity is ok
+
+test #4
+ an_int * a = a + ... + a (n times ) 
+test_scalar_multiplication is ok
+
+test #5
+ an_int * a = a * an_int 
+test_scalar_commutativity is ok
+
+test #6
+ -a = -1 * a 
+test_negative is Arg : AttributeError("'list' object has no attribute '__neg__'",)
+
+test #7
+ ( an_int *  other_scalar ) * a = an_int ( other_scalar * a )
+test_associativity_scalar_multiplication is ok
+
+test #8
+ ( an_int + other_scalar ) a = an_int * a  + other_scalar * a 
+test_multiply_scalar_associativity is ok
+
+test #9
+( a + b )  + c  = a + ( b + c )
+test_associativity is ok
+
+test #10
+ a - b = a + ( -1 * b) 
+test_substraction is Arg : TypeError("unsupported operand type(s) for -: 'list' and 'list'",)
+
+test #11
+ an_int ( a + b) = an_int *a + an_int * b 
+test_distributivity is ko
+[1, 2, 1, 2, 1, 2] != [1, 1, 1, 2, 2, 2] 
+
+test #12
+sum of the parts = sum of the total
+conservation is ok
+
+test #13
+sum of the differences == differences of the sum
+conservation_neg is Arg : TypeError("unsupported operand type(s) for -: 'list' and 'list'",)
+**************************************************
+
+<type 'list'> follows the dutch logic 
+
+**************************************************
+
+**************************************************
+
+testing for  'str' class
+
+ a = '1'
+ b = '2'
+ c = '4'
+ an_int = 3 
+ other_scalar = 4 
+ neutral element for addition is '' 
+
+**************************************************
+
+test #1
+ a + b = b + a 
+test_commutativity is ko
+'21' != '12' 
+
+test #2
+ a + neutral = a 
+test_neutral is ok
+
+test #3
+ 1 * a = a 
+test_multiplicative_identity is ok
+
+test #4
+ an_int * a = a + ... + a (n times ) 
+test_scalar_multiplication is ok
+
+test #5
+ an_int * a = a * an_int 
+test_scalar_commutativity is ok
+
+test #6
+ -a = -1 * a 
+test_negative is Arg : AttributeError("'str' object has no attribute '__neg__'",)
+
+test #7
+ ( an_int *  other_scalar ) * a = an_int ( other_scalar * a )
+test_associativity_scalar_multiplication is ok
+
+test #8
+ ( an_int + other_scalar ) a = an_int * a  + other_scalar * a 
+test_multiply_scalar_associativity is ok
+
+test #9
+( a + b )  + c  = a + ( b + c )
+test_associativity is ok
+
+test #10
+ a - b = a + ( -1 * b) 
+test_substraction is Arg : TypeError("unsupported operand type(s) for -: 'str' and 'str'",)
+
+test #11
+ an_int ( a + b) = an_int *a + an_int * b 
+test_distributivity is ko
+'121212' != '111222' 
+**************************************************
+
+<type 'str'> follows the dutch logic 
+
+**************************************************
+
+**************************************************
+
+testing for  'AccuDict' class
+
+ a = defaultdict(<type 'int'>, {'one_and_two': 3, 'one': 1})
+ b = defaultdict(<type 'int'>, {'two': 2, 'one_and_two': -1})
+ c = defaultdict(<type 'int'>, {'one': 3, 'three': 1, 'two': 2})
+ an_int = 3 
+ other_scalar = 4 
+ neutral element for addition is defaultdict(<type 'int'>, {}) 
+
+**************************************************
+
+test #1
+ a + b = b + a 
+test_commutativity is ok
+
+test #2
+ a + neutral = a 
+test_neutral is ok
+
+test #3
+ 1 * a = a 
+test_multiplicative_identity is ok
+
+test #4
+ an_int * a = a + ... + a (n times ) 
+test_scalar_multiplication is ok
+
+test #5
+ an_int * a = a * an_int 
+test_scalar_commutativity is ok
+
+test #6
+ -a = -1 * a 
+test_negative is ok
+
+test #7
+ ( an_int *  other_scalar ) * a = an_int ( other_scalar * a )
+test_associativity_scalar_multiplication is ok
+
+test #8
+ ( an_int + other_scalar ) a = an_int * a  + other_scalar * a 
+test_multiply_scalar_associativity is ok
+
+test #9
+( a + b )  + c  = a + ( b + c )
+test_associativity is ok
+
+test #10
+ a - b = a + ( -1 * b) 
+test_substraction is ok
+
+test #11
+ an_int ( a + b) = an_int *a + an_int * b 
+test_distributivity is ok
+
+test #12
+sum of the parts = sum of the total
+conservation is ok
+
+test #13
+sum of the differences == differences of the sum
+conservation_neg is ok
+**************************************************
+
+<class 'accu_dict.AccuDict'> respects the algebraic acceptation of addition
+
+**************************************************
+just for fun 
+	defaultdict(<type 'int'>, {'one_and_two': 12, 'one': 1})
+	+
+	defaultdict(<type 'int'>, {'two': 2, 'one_and_two': -9})
+	=
+	defaultdict(<type 'int'>, {'two': 2, 'one_and_two': 3, 'one': 1})
