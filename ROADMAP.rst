@@ -12,19 +12,31 @@ version x.y.z
 - **y** = improvement
 - **z** = bugfix
 
+STABLE
+    API wont change in this branch
+
+SID (Still In Development)
+    being polished and can only be used by the true warrior
 Path to world domination :
 **************************
 
 v 0.3.0
     VectorDict
-        STABLE : + - * / , cos, jaccard, norm, dot
-        STABLE : at, get_at, match_subtree, prune 
-        SID : find 
-        SID : pprint, tprint
+        STABLE : 
+            * addition, substraction, multiplication, division
+            * cos, jaccard, norm, dot
+            * at, get_at, match_subtree, prune 
+
+        SID : 
+            * find 
+            * pprint, tprint
+    
     SparseMatrix
         STABLE
+    
     Operation
         SID
+    
     Clause
         SID
 

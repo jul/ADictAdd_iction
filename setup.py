@@ -1,4 +1,5 @@
-#!env pyrhon
+#!/usr/bin/env pyrhon
+# -*- coding: "utf-8" -*-
 
 from distutils.command.build_py import build_py as _build_py
 from distutils.core import setup
@@ -22,14 +23,15 @@ test()
 
 setup(
         name='VectorDict',
-        version='0.2.0',
+        version='0.3.0',
         author='Julien Tayon',
         author_email='julien@tayon.net',
         packages=['vector_dict'],
         url='https://github.com/jul/ADictAdd_iction/',
         license='LICENSE.txt',
+        test_suite='vector_dict.test.test_VectorDict',
+        test='vector_dict.test.test_VectorDict',
         description='Implementing vector algebra on tree',
-        long_description=open('README.rst').read(),
         requires=[
         "collections","math"
         ],
