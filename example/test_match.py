@@ -34,6 +34,10 @@ pretty_present( w.find( lambda p, v : (
         has_type( int )(v) or has_type(float)(v)
     ) and  v > 3  ))
 pretty_present( w.find( lambda p, v : p.endswith( [ 'c' ] ) ) )
+
+
+"""
+RESULTS : 
 {
     a = {
         c = 1,
@@ -84,4 +88,4 @@ path ['a', 'c']
 has value 1
 path ['b', 'c'] 
 has value 1
-
+"""

@@ -1,4 +1,4 @@
-#!/sr/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #WTFPL
 """maybe giving a sense to
