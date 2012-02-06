@@ -16,12 +16,25 @@ Path to world domination :
 **************************
 
 v 0.3.0
+    VectorDict
+        STABLE : + - * / , cos, jaccard, norm, dot
+        STABLE : at, get_at, match_subtree, prune 
+        SID : find 
+        SID : pprint, tprint
+    SparseMatrix
+        STABLE
+    Operation
+        SID
+    Clause
+        SID
+
     adding some easy features
     matrix,
     vector basic operation (get, at, prune, find)
 
 v 0.5.0
-    unittest
+    unittest with a better code coverage
+    adding QA information (such as where is the ticketing)
 
 v 0.7.0 
     fully fonctionnal make chain
