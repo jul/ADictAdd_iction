@@ -30,18 +30,20 @@ class ConsistentAlgebrae(object):
         """
         only method really callable. 
         Arguments : 
-        - neutral : neutral element of addition for the object ; 
-        - scalar : real, float, or complex (normaly anything that is 1D, 
-        and follow algebraic rules);
-        - one : an element to test
-        - other : other element to test
+            - neutral : neutral element of addition for the object ; 
+            - scalar : real, float, or complex (normaly anything that is 1D, 
+              and follow algebraic rules);
+            - one : an element to test
+            - other : other element to test
+        
         
         optionnal :
-        - other_scalar : real, float, or complex (normaly anything that is 1D, 
-        and follow algebraic rules);
-        - context : default  "print" make it verbose ;
-        - collect_values : default lambda x : x, if testing for conservation
-        a lambda fonction for getting the values
+            - other_scalar : real, float, or complex 
+              (normaly anything that is 1D, and follow algebraic rules);
+            - context : default  "print" make it verbose ;
+            - collect_values : default lambda x : x, if testing for conservation
+              a lambda fonction for getting the values
+        
         """
         self.fail = 0
         self.context= kw.get("context", "print" )

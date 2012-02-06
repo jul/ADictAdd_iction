@@ -492,11 +492,29 @@ class VectorDict(defaultdict):
                 positive[k] = -v
         return positive
 
+    def tformat(self, indent_level = 0, base_indent = 4):
+        """pretty printing in a tree like form à la Perl"""
+        offset = " " *  indent_level * base_indent
+        toreturn = '{\n'
+        for k,v in self.iteritems():
+            toreturn += offset + ( " " * base_indent ) +  '%s = ' % k
+            if hasattr( v, "tformat"):
+                toreturn += v.tformat( indent_level+1, base_indent )
+            else:
+                toreturn += "%s" % ( isinstance( v, ( str, unicode) ) and ( "'%s'" % v ) or repr(v) )
+            toreturn += ',\n'
+        toreturn += offset +  '}'
+        return toreturn 
+
+    def tprint( self, indent_level = 0, base_indent = 4):
+        print self.tformat( indent_level, base_indent )
+ 
     def pprint(self):
+        """ pretty printing the VectorDict in flattened vectorish representation"""
         print "\n".join( [ 
-                    "%s=%r" % (
+                    "%s = %s" % (
                         "->".join( map(unicode, k)), 
-                        v
+                       isinstance( v, ( str, unicode) ) and ( "'%s'" % v ) or repr(v)  
                     ) for k, v in self.as_vector_iter() ] )
                 
     def __add__(left1, left2):
