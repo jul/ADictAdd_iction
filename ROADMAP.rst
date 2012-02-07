@@ -44,6 +44,9 @@ v 0.3.0
     matrix,
     vector basic operation (get, at, prune, find)
 
+v 0.4.0 
+    inlining example with methods so that it is more obvious what method does
+
 v 0.5.0
     unittest with a better code coverage
     adding QA information (such as where is the ticketing)
