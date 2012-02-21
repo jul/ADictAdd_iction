@@ -46,6 +46,8 @@ v 0.3.0
 
 v 0.4.0 
     inlining example with methods so that it is more obvious what method does
+    planning removing doublons in methods (add_path, as_row_iter, ...)
+
 
 v 0.5.0
     unittest with a better code coverage
@@ -62,6 +64,10 @@ v 0.9.0
 v 1.0.0 
     nice example and polishing
     I level up in python MMORPG and acquire skill «packaging» \o/ 
+
+v 1.0.1
+    pusblishing python MMORPG exp point by skills, plus the classes 
+    (core devs, module devs, sysadmins dev...)
 
 Personnal wishlist 
 ******************
