@@ -501,10 +501,7 @@ class VectorDict(defaultdict):
    
     @__flatten_generator
     def find(self, predicate_on_path_value, path = tuple() ):
-        """apply a fonction on value if predicate on key is foun
-
-
-d"""
+        """apply a fonction on value if predicate on key is found"""
         path = Path( path + tuple() )
         if predicate_on_path_value(Path( path) , self):
             yield  Path( path + tuple() )  ,self
