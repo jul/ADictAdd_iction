@@ -26,14 +26,39 @@ def convert_tree(a_tree):
         a_vector_dict += tree_from_path( e )
     return a_vector_dict
 
-class Path(  list):
-    def endswith( self, a_tuple ):
+class Path(tuple):
+    def __init__(self, a_tuple):
+        """construct a Path from a tuple or a list 
+        
+ >>> p = Path( [  'a', 'b', 'c' ] )
+ >>> p
+ >>> ( 'a', 'b', 'c' )
+ >>> p = Path( (  'a', 'b', 'c' ) )
+ >>> p
+ >>> ( 'a', 'b', 'c' )
+        """
+        self += tuple(a_tuple)
+
+    def endswith( self, *a_tuple ):
+        """check if path ends with the consecutive given has argumenbts value
+ 
+ >>> p = Path( [ 'a', 'b', 'c' ] )
+ >>> p.endswith( 'b', 'c' )
+ >>> True
+ >>> p.endswith( 'c', 'b' )
+ >>> False
+        """
         return self[len(self) - len(a_tuple) : ] == a_tuple
 
-    def startswith( self, a_tuple ):
+    def startswith( self, *a_tuple ):
+        """checks if a path starts with the value 
+ >>> p = Path( [ 'a', 'b', 'c', 'd' ] )
+ >>> p.startswith( 'a', 'b' )
+ >>> True
+        """
         return self[: len( a_tuple ) ] == a_tuple
 
-    def contains( self, a_tuple, _from = 0, follow = 0):
+    def _contains( self, a_tuple, _from = 0, follow = 0):
         if len( a_tuple) == follow:
             return True
         index = False
@@ -46,7 +71,7 @@ class Path(  list):
 
         try:
             index = here.index(a_tuple[follow] )
-            return  self.contains(
+            return  self._contains(
                     a_tuple, 
                         index +  1 , 
                         follow + 1
@@ -54,15 +79,45 @@ class Path(  list):
         except ValueError:
             return False
         except IndexError:
-            return self.contains(a_tuple, _from +  1 )
+            return self._contains(a_tuple, _from +  1 )
         return False
 
+    def contains(self, *a_tuple ):
+       """checks if the serie of keys is contained ina path
+ 
+ >>> p = Path( [ 'a', 'b', 'c', 'd' ] )
+ >>> p.contains( 'b', 'c' )
+ >>> True
+
+       """
+       return self._contains( a_tuple )
+
 def dot( obj1, obj2):
-    """for ease of reading and writing"""
+    """for ease of reading and writing
+    equivalent to obj1.dot( obj2 )
+    does the leaf by leaf product of the imbricated dict for all 
+    the keys that are similar. 
+
+ >>> dot(
+        VectorDict( int, dict( x=1 , y=1, z=0) ),
+        VectorDict( int, dict( x=1 , y=1, z=1) ),
+     ) 
+ >>> 2.0
+    
+    """
     return obj1.dot(obj2)
 
 def cos( obj1, obj2):
-    """for ease of reading and writing"""
+    """for ease of reading and writing
+    equivalent to the cosinus similarity obj1.cos(2)
+    returns the cosinus similarity of two vectorDict 
+    
+ >>> cos(
+        VectorDict( int, dict( x=1 , y=1) ),
+        VectorDict( int, dict( x=1 , y=0) ),
+     ) 
+>>> 0.7071067811865475
+    """
     return obj1.cos(obj2)
 
 
@@ -138,6 +193,7 @@ class VectorDict(defaultdict):
     """Dict that supports all operations the way of vector does : 
     + - / * dot, and operations with scalars"""
     def __init__(self, *a , **a_dict ):
+        """Constructs like a collections.defaultdict (put sphinx ref)"""
         
         super( VectorDict, self).__init__( *a,**a_dict)
 
@@ -148,11 +204,37 @@ class VectorDict(defaultdict):
         self =  convert_tree( a_tree)
 
     def match_tree(self, a_tree):
-        """does the tree given ha an argument match the actual 
+        """does the tree given has an argument match the actual 
         tree.
-        if tree leaves are Clauses, the match_tree will apply 
-        the clauses.
+ if tree leaves are Clauses, the match_tree will apply the clauses.
+
+ **Direct Match**
+
+>>> a_tree = dict( 
+            b = dict( 
+                c = 3.0, 
+                d = dict( e = True)
+            ), 
+        )
+ >>> complex_dict = convert_tree( a_tree )
+ >>> complex_dict.match_tree( dict( c= 3.0 ,d = dict( e = True) ))
+ >>> False
+ >>> complex_dict.match_tree( dict( b=dict( c=3.0 ,d = dict( e = True) ))
+ >>> True
+
+ **Match with clauses**
+
+ >>> from vector_dict.Clause import Clause, anything
+ >>> complex_dict.match_tree( dict( b=dict( c=3.0 , d=anything ) ) )
+ >>> True
+ >>> complex_dict.match_tree({ 'b': { 
+    'c': Clause( lambda v : 1 < v < 5), 
+    'd' : anything 
+ } } )
+ >>> True
+ 
         """
+
         match_to_find = len(a_tree.keys())
         if not set(a_tree).issubset( set(self.keys())):
             return False
@@ -191,7 +273,9 @@ class VectorDict(defaultdict):
         return 0 == match_to_find
 
     def add_path(self, path):
-        """ same as buildpath other implementation, 
+        """
+        | Warning | soon to be deprecated 
+         same as buildpath other implementation, 
         I need to make test, this one seems less interesting"""
         self += tree_from_path( path)
         self.__setitem__(path[0],self[path[0]])
@@ -200,7 +284,30 @@ class VectorDict(defaultdict):
 
     def build_path( self, *path):
         """ implementation of constructing a path in a tree, argument is 
-        a serie of key """
+        a serie of key
+ 
+ >>> a = VectorDict(int, {})
+ >>> a.build_path( 'k', 1 )
+ >>> a.tprint()
+ {
+     k = 1,
+ }
+ >>> a.build_path( 'b', 'n', [ 1 ] )
+ >>> a.build_path( 'd', 'e',  2  )
+ >>> a.build_path( 'd', 'f',  4  )
+ >>> a.tprint()
+ {
+     k = 1,
+     b = {
+         n = [1],
+     },
+     d = {
+         e = 2,
+         f = 4,
+     },
+ }
+
+ """
         if len(path) == 2:
             key, value = path[0:2]
             if  key in self.keys() or self.get(key):
@@ -214,10 +321,34 @@ class VectorDict(defaultdict):
             else:
                 if key in self.keys():
                     raise Exception("Path already present")
-            self.__setitem__( key,  tree_from_path( path[1:] ))
+            if not is_leaf( self[key] ):
+                self[key] +=  tree_from_path( path[1:] )
+            else:
+                self.__setitem__(key,  tree_from_path( path[1:] ))
 
     def prune(self, *path):
-        """delete all items at path """
+        """delete all items at path 
+        
+ >>> a  = VectorDict(int, {})
+ >>> a.build_path( 'g', 'todel' , True )
+ >>> a.build_path( 'g', 'tokeep' , True )
+ >>> a.tprint()
+ {
+     g = {
+         tokeep = True,
+         todel = True,
+     },
+ }
+ >>> a.prune( 'g', 'todel' )
+ >>> a.tprint()
+ {
+     g = {
+         tokeep = True,
+     },
+ }
+
+"""
+
         todel = None
         if len(path)>1:
             self.at(path[:-1]).__delitem__(path[-1])
@@ -226,11 +357,32 @@ class VectorDict(defaultdict):
 
     def push(self, path, value ):
         """ pushing value at place given by path
-        will create the path if inexistent"""
+        will create the path if inexistent, 
+        alias for build_path, where last value of value if distinguished from 
+        path
+        Not pretty useful. 
+"""
         self.build_path( path + [ v ] )
 
     def get_at(self, *path):
-        """ get element at path given has a serie of key"""
+        """ Get a copy of an element at the coordinates given by the path
+        Throw a KeyError excpetion if the path does not led to an element
+ 
+ >>> intricated = convert_tree( { 'a' : { 'a' : { 'b' : { 'c' :  1 } } } } )
+ >>> intricated.get_at( 'a', 'a', 'b' )
+ >>> # defaultdict(<class 'vector_dict.VectorDict.VectorDict'>, {'c': 1})
+ >>> intricated.get_at( 'a', 'a', 'b', 'c' )
+ >>> # 1
+ >>> intricated.get_at( 'oops' )
+ >>> # Traceback (most recent call last):
+ >>> # File "<input>", line 1, in <module>
+ >>> # File "vector_dict/VectorDict.py", line 304, in get_at
+ >>> # return self.at( path, None , True)
+ >>> # File "vector_dict/VectorDict.py", line 330, in at
+ >>> # value = here[path[ -1 ] ]
+ >>> # KeyError: 'oops'
+ 
+ """
         return self.at( path, None , True)
 
     def at(self, path, apply_here = None, copy = False):
@@ -238,7 +390,26 @@ class VectorDict(defaultdict):
         gets to the mentioned path eventually apply a lambda on the value
         and return the node, 
         and copy it if mentioned. 
-        
+ >>> intricated = convert_tree( { 'a' : { 'a' : { 'b' : { 'c' :  1 } } } } )
+ >>> pt = intricated.at( ( 'a', 'a', 'b' ) )
+ >>> pt
+ defaultdict(<class 'vector_dict.VectorDict.VectorDict'>, {'c': 1})
+ >>> pt['c'] = 2
+ >>> intricated.tprint()
+ {
+    a = {
+        a = {
+            b = {
+                c = 2,
+            },
+        },
+    },
+ }
+ >>> intricated.at( ( 'a', 'a', 'b' ), lambda x : x * -2  )
+ defaultdict(<class 'vector_dict.VectorDict.VectorDict'>, {'c': -4})
+ >>> intricated.pprint()
+ a->a->b->c = -4
+
         """
         here = self
         if apply_here and not( is_function(apply_here) ):
@@ -272,6 +443,9 @@ class VectorDict(defaultdict):
 
     #@flatten_generator
     def diff(self, other, diff_mine = None,diff_other=None, path = []):
+        """Still In Development. 
+        trying to have a tree dif"""
+
         def prune( key, adict):
             def todo():
                 adict.__delitem__(key)
@@ -326,17 +500,20 @@ class VectorDict(defaultdict):
             return left1.divide(left2)
    
     @__flatten_generator
-    def find(self, predicate_on_path_value, path = [] ):
-        """apply a fonction on value if predicate on key is found"""
-        path = Path( path + [] )
+    def find(self, predicate_on_path_value, path = tuple() ):
+        """apply a fonction on value if predicate on key is foun
+
+
+d"""
+        path = Path( path + tuple() )
         if predicate_on_path_value(Path( path) , self):
-            yield  Path( path + [] )  ,self
+            yield  Path( path + tuple() )  ,self
         for k,v in self.iteritems():
             if isinstance(v, VectorDict ):
-                yield    v.find( predicate_on_path_value, Path( path + [ k ] ) )
+                yield    v.find( predicate_on_path_value, Path( path + ( k,)  ) )
             else:
-                if predicate_on_path_value(Path( path + [k]), v):
-                    yield  Path( path + [k])  ,v 
+                if predicate_on_path_value(Path( path + (k,) ), v):
+                    yield  Path( path + (k,))  ,v 
 
                  
 

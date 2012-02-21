@@ -4,10 +4,42 @@ sys.path += [os.path.dirname( sys.modules[__name__].__file__) + os.sep + '..'  ]
 print sys.path[-1]
 
 import unittest
-from VectorDict import VectorDict, convert_tree
+from VectorDict import VectorDict, convert_tree, Path, dot, cos
 from Clause import is_leaf, has_type, is_container, anything
 from Operation import mul, cast
+from math import sqrt
+class TestPath(unittest.TestCase):
+    def setUp(self):
+        self.a_path = Path( [ e for e in  xrange(10 ) ] )
+    
+    def test_build(self):
+        self.assertEqual(
+            self.a_path,
+            ( 0, 1, 2 , 3 , 4 , 5 , 6 , 7 , 8 , 9)
+        )
+    def test_startswith(self):
+        self.assertEqual(
+            self.a_path.startswith( 0, 1 , 2 ),
+            True
+        )
 
+    def test_endswith(self):
+        self.assertEqual(
+            self.a_path.endswith( 8, 9),
+            True
+        )
+
+    def test_contains1(self):
+        self.assertEqual(
+            self.a_path.contains( 2 , 3 , 4 ),
+            True
+        )
+
+    def test_contains1(self):
+        self.assertEqual(
+            self.a_path.contains( 0, 1 , 2 ),
+            True
+        )
 class TestVectorDict(unittest.TestCase):
     
     def setUp(self):
@@ -97,7 +129,7 @@ class TestVectorDict(unittest.TestCase):
                 not is_leaf(v) and v.match_tree(
                 dict( c= has_type(float) , d = is_container   )
                 )
-            ))  ][0][0], ['b'])
+            ))  ][0][0], ('b',))
 
         
     def test_collision_build_path(self):
@@ -157,6 +189,33 @@ class TestVectorDict(unittest.TestCase):
             self.cplx.at( ['b', 'c' ] ),
             self.cplx.get_at( 'b' , 'c' )
     )
+
+
+    def test_dot(self):
+        self.assertEqual( 
+            dot(
+                VectorDict( int, dict( x=1 , y=1, z=0) ),
+                VectorDict( int, dict( x=1 , y=1, z=1) ),
+             ), 
+             float( 2.0 )
+        )
+
+    def test_cos(self):
+        self.assertAlmostEqual( 
+            cos(
+                VectorDict( int, dict( x=1 , y=0) ),
+                VectorDict( int, dict( x=1 , y=1) ),
+             ), 
+             float( sqrt(2) / 2 )
+        )
     
+    def test_build_path_collision(self):
+        self.easy.build_path( 'ext' , 'y',  1 )
+        self.easy.build_path( 'ext' , 'z',  1 )
+        self.assertEqual(
+            len(self.easy['ext'].keys()), 
+            2
+        )
+        
 if __name__ == '__main__':
     unittest.main(verbosity=2)

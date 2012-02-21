@@ -15,6 +15,7 @@ Contents:
     vector
     matrix
     cl_op
+    path
     roadmap  
 
   
