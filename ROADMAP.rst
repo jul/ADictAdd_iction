@@ -44,6 +44,10 @@ v 0.3.0
     matrix,
     vector basic operation (get, at, prune, find)
 
+v 0.3.1 
+    Bugfix on build_path 
+    Adding tests
+
 v 0.4.0 
     inlining example with methods so that it is more obvious what method does
     planning removing doublons in methods (add_path, as_row_iter, ...)
