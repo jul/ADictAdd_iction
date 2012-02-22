@@ -23,11 +23,11 @@ test()
 
 setup(
         name='VectorDict',
-        version='0.3.0',
+        version='0.4.0',
         author='Julien Tayon',
         author_email='julien@tayon.net',
         packages=['vector_dict'],
-        url='https://github.com/jul/ADictAdd_iction/',
+        url='http://readthedocs.org/docs/vectordict/en/latest/'
         license='LICENSE.txt',
         test_suite='vector_dict.test.test_VectorDict',
         test='vector_dict.test.test_VectorDict',

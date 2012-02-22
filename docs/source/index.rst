@@ -3,6 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+References : 
+============
+
+* source : https://github.com/jul/ADictAdd_iction/
+* online documentation : http://readthedocs.org/docs/vectordict/en/latest/
+* ticketing : https://github.com/jul/ADictAdd_iction/issues
 
 Vector Dict algebraic operation on rooted trees
 ===============================================
