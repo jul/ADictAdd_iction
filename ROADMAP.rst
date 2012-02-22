@@ -64,7 +64,9 @@ v 0.4.1
 
 
 v 0.5.0
-    unittest with a better code coverage
+    
+    * adding read the doc git post commit hook
+    * unittest with a better code coverage
 
 v 0.7.0 
     fully fonctionnal make chain
