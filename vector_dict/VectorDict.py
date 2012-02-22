@@ -17,13 +17,28 @@ __all__ = ['cos', 'dot',  'iter_object' , 'tree_from_path', 'Path',
 def convert_tree(a_tree):
     """
     convert from any other nested object to a VectorDict 
-    works very well with nested dict
-    Dont work as a method (why ?)
+    espaecially usefull for constructing a vector dict from 
+    intricated dict of dicts. 
+    *Dont work as a class method (why ?)*
+
+ >>> convert_tree({ 'a' : { 'a' : { 'r' : "yop", 'b' : { 'c' :  1 }}}}).tprint()
+ {
+     a = {
+         a = {
+             r = 'yop',
+             b = {
+                 c = 1,
+             },
+         },
+     },
+ }
+
+
     """
     a_vector_dict = VectorDict()
 
     for e in iter_object_nl(a_tree, flatten = True):
-        a_vector_dict += tree_from_path( e )
+        a_vector_dict += tree_from_path( *e )
     return a_vector_dict
 
 class Path(tuple):
@@ -83,7 +98,7 @@ class Path(tuple):
         return False
 
     def contains(self, *a_tuple ):
-       """checks if the serie of keys is contained ina path
+       """checks if the serie of keys is contained in a path
  
  >>> p = Path( [ 'a', 'b', 'c', 'd' ] )
  >>> p.contains( 'b', 'c' )
@@ -122,8 +137,19 @@ def cos( obj1, obj2):
 
 
 
-def tree_from_path(path):
-    """adding a path to a vector"""
+def tree_from_path( *path ):
+    """creating a dict from a path
+
+ >>> tree_from_path( 'a', 'b', 'c', 1  ).tprint()
+ {
+     a = {
+         b = {
+             c = 1,
+         },
+     },
+ }
+
+    """
     path_to_key = list(path)
     root = VectorDict( VectorDict, { path_to_key.pop() : path_to_key.pop()})
     current = root
@@ -272,15 +298,6 @@ class VectorDict(defaultdict):
                         #return False
         return 0 == match_to_find
 
-    def add_path(self, path):
-        """
-        | Warning | soon to be deprecated 
-         same as buildpath other implementation, 
-        I need to make test, this one seems less interesting"""
-        self += tree_from_path( path)
-        self.__setitem__(path[0],self[path[0]])
-        ### fighting against amnesia
-
 
     def build_path( self, *path):
         """ implementation of constructing a path in a tree, argument is 
@@ -322,9 +339,9 @@ class VectorDict(defaultdict):
                 if key in self.keys():
                     raise Exception("Path already present")
             if not is_leaf( self[key] ):
-                self[key] +=  tree_from_path( path[1:] )
+                self[key] +=  tree_from_path( *path[1:] )
             else:
-                self.__setitem__(key,  tree_from_path( path[1:] ))
+                self.__setitem__(key,  tree_from_path( *path[1:] ))
 
     def prune(self, *path):
         """delete all items at path 
@@ -459,7 +476,7 @@ class VectorDict(defaultdict):
         for k, v in self.iteritems():
             if not k  in other.keys():
             ## pour que l'autre me ressemble enlevons toutes les clés
-                diff_other += tree_from_path(  path + [k, prune( k, self)  ] )
+                diff_other += tree_from_path(  * [ path + [k, prune( k, self) ]  ] )
             else:
                 ## k in other.keys()
                 ## les clés sont dans les deux arbres
@@ -471,9 +488,9 @@ class VectorDict(defaultdict):
                         diff_other = diff_other + vd_o
                     elif isinstance( v , VectorDict) or isinstance( 
                         other[k], VectorDict):
-                        diff_mine +=  tree_from_path(  path + [k, cp_if_dict( other[k]) ] )
+                        diff_mine +=  tree_from_path( *[ path + [k, cp_if_dict( other[k]) ] ] )
                     else: 
-                        diff_mine +=  tree_from_path( path + [k, - other[k]    ] )
+                        diff_mine +=  tree_from_path( *[  path + [k, - other[k]   ] ] )
 
                 
                 else:
@@ -484,7 +501,7 @@ class VectorDict(defaultdict):
                     
         for k , v in other.iteritems():
             if not k  in self.keys():
-                diff_mine += tree_from_path( path + [k, v ] )
+                diff_mine += tree_from_path( *[  path + [k, v ] ] )
 
         return diff_mine, diff_other
                
@@ -539,6 +556,21 @@ class VectorDict(defaultdict):
         where k is the path, v is the leaf value
         source:
         http://tech.blog.aknin.name/2011/12/11/walking-python-objects-recursively/
+
+ >>> a = convert_tree({ 'a' : { 'a' : { 'r' : "yop" , 'b' : { 'c' :  1 }}}})
+ >>> a.tprint()
+ {
+     a = {
+         a = {
+             r = 'yop',
+             b = {
+                 c = 1,
+             },
+         },
+     },
+ }
+ >>> [ e for e in a.as_vector_iter() ]
+ [(('a', 'a', 'r'), 'yop'), (('a', 'a', 'b', 'c'), 1)]
         """
         return iter_object(self,(),flatten=False)
     
@@ -548,6 +580,23 @@ class VectorDict(defaultdict):
         set( key0, key1, key2 , child)
         very useful for turning a dict in a row for a csv output
         all keys and values are flattened
+
+ >>> a = convert_tree({ 'a' : { 'a' : { 'r' : "yop" , 'b' : { 'c' :  1 }}}})
+ >>> a.tprint()
+ {
+     a = {
+         a = {
+             r = 'yop',
+             b = {
+                 c = 1,
+             },
+         },
+     },
+ }
+ >>> [ e for e in a.as_row_iter() ]
+ [['a', 'a', 'r', 'yop'], ['a', 'a', 'b', 'c', 1]]
+
+
         """
         arg["flatten"] = arg.get("flatten", True)
         return iter_object(self,(),**arg )

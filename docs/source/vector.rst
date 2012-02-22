@@ -5,12 +5,19 @@ Vector Dict
 
 .. automodule:: vector_dict.VectorDict
 
+Helpers
+*******
+
+.. autoclass:: vector_dict.VectorDict.tree_from_path
+
+.. autoclass:: vector_dict.VectorDict.convert_tree
+
 Complete API
 ************
 
+
 .. autoclass:: vector_dict.VectorDict.VectorDict
     :members:
-
 
 
 

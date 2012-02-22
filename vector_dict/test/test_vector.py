@@ -149,12 +149,12 @@ class TestVectorDict(unittest.TestCase):
             self.cplx["b"]["new"],
             "whatever")
             
-    def test_add_path(self):
-        self.cplx.add_path( [  'b' , "new",  "whatever"]  )
-        self.cplx.add_path( [  'b' , "new",  "whatever"]  )
-        self.assertEqual( 
-            self.cplx["b"]["new"],
-            "whatever" * 2 )
+   # def test_add_path(self):
+   #     self.cplx.add_path( [  'b' , "new",  "whatever"]  )
+   #     self.cplx.add_path( [  'b' , "new",  "whatever"]  )
+   #     self.assertEqual( 
+   #         self.cplx["b"]["new"],
+   #         "whatever" * 2 )
     
     def test_at1(self):
         self.assertRaises( 

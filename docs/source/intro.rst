@@ -1,9 +1,10 @@
+
 =====================================================
 Concept of algebraic algebrae on dict and rooted tree
 =====================================================
 
 First of all, this project was a mere intuition that worked, and then I
-discovered people like explantations. So here it comes.
+discovered people liked explantations. So here I try.
 
 The questions are does it makes sense, is it consistent, what we can
 expect from this, and then is implementation too complex ? 
@@ -12,8 +13,7 @@ Algebrae
 ========
 
 .. warning:: 
-   Of course, since mist people seems to have forgotten there math lessons,
-   I always refer to **linear algebrae** when I say **algebrae** not to
+   Of course, I always refer to **linear algebrae** when I say **algebrae** not to
    confuse them. And of course the implicit geometry used for vector is
    euclidian. But shush... Some people still dont know there is much more
    than only euclidian geometry :) 
@@ -55,11 +55,11 @@ Is this legitim ?
 
 Well I have to primitive to display imbricated VectorDict 
 
-And as you can see, by collapsiong a path in the set of keys that leads
+And as you can see, by collapsing a path in the set of keys that leads
 to a value I can always find a bijection between a vector and the n-ary
 rooted tree obtained. 
 
-
+Therefore it is legitim.
 
 .. literalinclude:: ../../example/pretty_printing.py
 
@@ -84,13 +84,16 @@ used, such as a parser is.
 
 Matrices are not as fancy as jquery or Xpath yet for two main reasons : 
 
-- matrices dont make fancy adressing, a matrix is about absolute input  dimension,
-absolute output dimension and a scalar by wich to multiply the value ; 
-- matrices are normally not complicated :) 
+* matrices dont make fancy adressing, a matrix is about absolute input  dimension, absolute output dimension and a scalar by wich to multiply the value ; 
+* matrices are normally not complicated :) 
 
 I was too lazy to do the normal matrix, I cheated a little bit by
 allowing matrix to have matrix as values, and broadened a little
 bit the notion of matrix. 
+
+It is simply a convenient way to transform a tree in a tree, and it can be seen as code that can be manipulated (added, or'ed, 
+multiplied ...)
+
 
 Metrics oriented querying
 =========================
@@ -118,4 +121,3 @@ books concerning the revelant langage it can be easily ported to :
 
 * Perl,
 * Ruby,
-

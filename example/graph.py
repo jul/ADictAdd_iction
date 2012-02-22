@@ -77,7 +77,7 @@ def path_collider(vector, path):
     path_copy = list(path)
     if not isinstance( vector, VectorDict):
         if len(vector):
-            vector = tree_from_path( vector + [ "weight" , 1 ])
+            vector = tree_from_path( * ( vector + [ "weight" , 1 ] ))
         else:
             vector = VectorDict( VectorDict, dict() )
     current = vector

@@ -17,6 +17,7 @@ STABLE
 
 SID (Still In Development)
     being polished and can only be used by the true warrior
+
 Path to world domination :
 **************************
 
@@ -50,7 +51,11 @@ v 0.3.1
 
 v 0.4.0 
     inlining example with methods so that it is more obvious what method does
-    planning removing doublons in methods (add_path, as_row_iter, ...)
+    
+    * removing add_path can be replaced by vectordict += tree_from_path( * path )
+    * more doc
+    * broke diff
+
 
 
 v 0.5.0
