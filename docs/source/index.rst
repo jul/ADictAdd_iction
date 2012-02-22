@@ -17,11 +17,12 @@ Contents:
 
 .. toctree::
     intro
-    consistent
     vector
+    finding
     matrix
     cl_op
     path
+    consistent
     roadmap  
 
   

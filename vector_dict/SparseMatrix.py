@@ -13,10 +13,9 @@ from collections import namedtuple, defaultdict
 __all__ = [ 'Coordinates', 'SparseMatrix' ]
 
 
-## bug in build path
-## temporaly using add_path
 
 Coordinates = namedtuple("Coordinates", "src, dst")
+
 class SparseMatrix(VectorDict):
     """Sparse Matrice on dict of dict of dict
     a sparse matrix is a set of 

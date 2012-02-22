@@ -3,7 +3,7 @@
 """Dict behaving like a vector, and supporting all operations
 the algebraic way
 """
-from collections import defaultdict
+from collections import namedtuple, defaultdict
 from collections import Sequence, Mapping
 from math import sqrt
 import types
@@ -11,7 +11,8 @@ from  Clause import Clause, is_leaf, is_container, is_function
 #WTFPL
 
 __all__ = ['cos', 'dot',  'iter_object' , 'tree_from_path', 'Path',
-    'flattening', 'can_be_walked']
+    'flattening', 'can_be_walked', 'Element']
+
 
 
 def convert_tree(a_tree):
@@ -40,6 +41,8 @@ def convert_tree(a_tree):
     for e in iter_object_nl(a_tree, flatten = True):
         a_vector_dict += tree_from_path( *e )
     return a_vector_dict
+
+Element = namedtuple('Element' , "path value")
 
 class Path(tuple):
     def __init__(self, a_tuple):
@@ -117,7 +120,7 @@ def dot( obj1, obj2):
         VectorDict( int, dict( x=1 , y=1, z=0) ),
         VectorDict( int, dict( x=1 , y=1, z=1) ),
      ) 
- >>> 2.0
+ 2.0
     
     """
     return obj1.dot(obj2)
@@ -131,7 +134,7 @@ def cos( obj1, obj2):
         VectorDict( int, dict( x=1 , y=1) ),
         VectorDict( int, dict( x=1 , y=0) ),
      ) 
->>> 0.7071067811865475
+ 0.7071067811865475
     """
     return obj1.cos(obj2)
 
@@ -521,13 +524,13 @@ class VectorDict(defaultdict):
         """apply a fonction on value if predicate on key is found"""
         path = Path( path + tuple() )
         if predicate_on_path_value(Path( path) , self):
-            yield  Path( path + tuple() )  ,self
+            yield  Element( Path( path + tuple() )  ,self )
         for k,v in self.iteritems():
             if isinstance(v, VectorDict ):
-                yield    v.find( predicate_on_path_value, Path( path + ( k,)  ) )
+                yield  v.find( predicate_on_path_value, Path( path + ( k,)  ) ) 
             else:
                 if predicate_on_path_value(Path( path + (k,) ), v):
-                    yield  Path( path + (k,))  ,v 
+                    yield  Element( path =  Path( path + (k,))  ,value = v  )
 
                  
 
