@@ -56,11 +56,15 @@ v 0.4.0
     * more doc
     * broke diff
 
+v 0.4.1
+    
+    * adding doc for finding item in a tree ;
+    * adding QA information (such as where is the ticketing) in the documentation.
+
 
 
 v 0.5.0
     unittest with a better code coverage
-    adding QA information (such as where is the ticketing)
 
 v 0.7.0 
     fully fonctionnal make chain
