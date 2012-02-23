@@ -716,6 +716,34 @@ class VectorDict(defaultdict):
         for path,v in self.intersection(other).as_vector_iter():
             new_dict.prune( *path )
         return new_dict
+    def issubset( self, other ):
+        """tells if all element of self are included in other
+
+ >>> from vector_dict.VectorDict import convert_tree, VectorDict,Element,Path
+ >>> a = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, d = 2, c=1  ) ), 'e' :  1 } )
+ >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 1   ) ) } )
+ >>> b.issubset(a)
+ True
+ >>> a.issubset(b)
+ False
+
+        """
+        return self.intersection(other) == self
+
+    def issuperset(self, other):
+        """tells if all element of other is included in self
+        throws an exception if two leaves in the two trees have different 
+        values
+ >>> from vector_dict.VectorDict import convert_tree, VectorDict,Element,Path
+ >>> a = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, d = 2, c=1  ) ), 'e' :  1 } )
+ >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 1   ) ) } )
+ >>> a.issuperset(b)
+ True
+ >>> b.issuperset(a)
+ False
+"""
+
+        return self.union(other) == self
 
     def __internal_divide__(self, other):
         """dividing two vectors internaly"""
