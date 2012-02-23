@@ -390,17 +390,17 @@ class VectorDict(defaultdict):
  
  >>> intricated = convert_tree( { 'a' : { 'a' : { 'b' : { 'c' :  1 } } } } )
  >>> intricated.get_at( 'a', 'a', 'b' )
- >>> # defaultdict(<class 'vector_dict.VectorDict.VectorDict'>, {'c': 1})
+ defaultdict(<class 'vector_dict.VectorDict.VectorDict'>, {'c': 1})
  >>> intricated.get_at( 'a', 'a', 'b', 'c' )
- >>> # 1
+ 1
  >>> intricated.get_at( 'oops' )
- >>> # Traceback (most recent call last):
- >>> # File "<input>", line 1, in <module>
- >>> # File "vector_dict/VectorDict.py", line 304, in get_at
- >>> # return self.at( path, None , True)
- >>> # File "vector_dict/VectorDict.py", line 330, in at
- >>> # value = here[path[ -1 ] ]
- >>> # KeyError: 'oops'
+ Traceback (most recent call last):
+ File "<input>", line 1, in <module>
+ File "vector_dict/VectorDict.py", line 304, in get_at
+ return self.at( path, None , True)
+ File "vector_dict/VectorDict.py", line 330, in at
+ value = here[path[ -1 ] ]
+ KeyError: 'oops'
  
  """
         return self.at( path, None , True)
@@ -530,11 +530,11 @@ class VectorDict(defaultdict):
 
     def __idiv__(self, other):
         """immediate division /= """
-        return self.__opfactory__(other, False, lambda x,y: x/y , "__divide__" )
+        return self.__opfactory__(other, False, lambda x,y: x/y , "__internal_divide__" )
 
     def __div__(self, other):
         """div with copy"""
-        return self.__opfactory__(other, True, lambda x,y: x/y , "__divide__" )
+        return self.__opfactory__(other, True, lambda x,y: x/y , "__internal_divide__" )
 
     def __rmul__(self, other):
         return self.__mul__(other)
@@ -550,7 +550,7 @@ class VectorDict(defaultdict):
             other, 
             copy = True, 
             extern_operation = lambda x,y : x*y ,
-            intern_operation = "__homothetia__"
+            intern_operation = "__internal_mul__"
         ):
         """muler"""
         ## __imul__ later
@@ -626,7 +626,9 @@ class VectorDict(defaultdict):
         arg["flatten"] = arg.get("flatten", True)
         return iter_object(self,(),**arg )
 
-    def __divide__(self, other):
+    
+    
+    def __internal_divide__(self, other):
         """multiplying to vectors as one vector of homothetia * vector
         it is a shortcut for a multiplication of a diagonal matrix
         missing keys in the pseudo diagonal matrix are pruned"""
@@ -635,23 +637,23 @@ class VectorDict(defaultdict):
         ## how could I get the factory of the default dict ? 
         new_dict = VectorDict(VectorDict, dict() )
         for k in common_key:
-            if  hasattr( self[k], "__divide__") :
-                new_dict[k] = (self[k]).__divide__( other[k] )
+            if  hasattr( self[k], "__internal_divide__") :
+                new_dict[k] = (self[k]).__internal_divide__( other[k] )
             else:
                 new_dict[k] = self[k] / other[k]
         return new_dict
 
-    def __homothetia__(self, other):
+    def __internal_mul__(self, other):
         """multiplying to vectors as one vector of homothetia * vector
         it is a shortcut for a multiplication of a diagonal matrix
         missing keys in the pseudo diagonal matrix are pruned"""
-
+        
         common_key =  set( self.keys() ) &  set( other.keys() )
         ## how could I get the factory of the default dict ? 
         new_dict = VectorDict(VectorDict, dict() )
         for k in common_key:
-            if  hasattr( self[k], "__homothetia__") :
-                new_dict[k] = (self[k]).__homothetia__( other[k] )
+            if  hasattr( self[k], "__internal_mul__") :
+                new_dict[k] = (self[k]).__internal_mul__( other[k] )
             else:
                 new_dict[k] = self[k] * other[k]
         return new_dict
