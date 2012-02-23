@@ -181,7 +181,7 @@ class ConsistentAlgebrae(object):
         left = self.scalar * self.one
         right = self.one
         for i in xrange(self.scalar - 1):
-            right = right + self.one
+            right += self.one
         return (left, right)
 
     @fixture_and_test

@@ -228,7 +228,7 @@ class TestVectorDict(unittest.TestCase):
 
     def test_bug_1( self ):
         """bug  #1 : * returns a copy where a reference is needed"""
-        pt = self.easy.at([])
+        pt = self.easy
         pt *= -1
         self.assertEqual(
             self.easy,

@@ -510,14 +510,6 @@ class VectorDict(defaultdict):
                
 
 
-    def __div__(left1, left2, *a, **lw):
-        """dict by dict division"""
-        if isinstance(left2, (float, int, complex)):
-            return left1.__rdiv__(left2)
-        if isinstance(left1, (float, int, complex)):
-            return left2.__rdiv__(left1)
-        else:
-            return left1.divide(left2)
    
     @__flatten_generator
     def find(self, predicate_on_path_value, path = tuple() ):
@@ -532,16 +524,46 @@ class VectorDict(defaultdict):
                 if predicate_on_path_value(Path( path + (k,) ), v):
                     yield  Element( path =  Path( path + (k,))  ,value = v  )
 
-                 
+    def  __rdiv__(self, other):
+        """reverse division"""
+        return self.__div__(other)
 
-    def __mul__(left1, left2, *a, **lw):
+    def __idiv__(self, other):
+        """immediate division /= """
+        return self.__opfactory__(other, False, lambda x,y: x/y , "__divide__" )
+
+    def __div__(self, other):
+        """div with copy"""
+        return self.__opfactory__(other, True, lambda x,y: x/y , "__divide__" )
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __imul__(self, other):
+        return self.__opfactory__(other, False)
+
+    def __mul__(self, other):
+        return self.__opfactory__(other, True)
+
+    def __opfactory__(
+            self, 
+            other, 
+            copy = True, 
+            extern_operation = lambda x,y : x*y ,
+            intern_operation = "__homothetia__"
+        ):
         """muler"""
-        if isinstance(left2, (float, int, complex)):
-            return left1.__rmul__(left2)
-        if isinstance(left1, (float, int, complex)):
-            return left2.__rmul__(left1)
+        ## __imul__ later
+        if not isinstance( self, VectorDict ):
+            self, other= other, self
+        a_copy = copy and self.copy() or self
+
+        if isinstance(other, (float, int, complex)):
+            for k, v in self.iteritems():
+                a_copy[k] = extern_operation( v , other)
+            return a_copy
         else:
-            return left1.homothetia(left2)
+            return getattr(a_copy, intern_operation)(other)
 
     def __neg__(self):
         for k, v in self.iteritems():
@@ -604,33 +626,36 @@ class VectorDict(defaultdict):
         arg["flatten"] = arg.get("flatten", True)
         return iter_object(self,(),**arg )
 
-    def divide(self, other):
+    def __divide__(self, other):
         """multiplying to vectors as one vector of homothetia * vector
         it is a shortcut for a multiplication of a diagonal matrix
         missing keys in the pseudo diagonal matrix are pruned"""
 
         common_key =  set( self.keys() ) &  set( other.keys() )
+        ## how could I get the factory of the default dict ? 
         new_dict = VectorDict(VectorDict, dict() )
         for k in common_key:
-            if  hasattr( self[k], "homothetia") :
-                new_dict[k] = (self[k]).divide( other[k] )
+            if  hasattr( self[k], "__divide__") :
+                new_dict[k] = (self[k]).__divide__( other[k] )
             else:
                 new_dict[k] = self[k] / other[k]
         return new_dict
 
-    def homothetia(self, other):
+    def __homothetia__(self, other):
         """multiplying to vectors as one vector of homothetia * vector
         it is a shortcut for a multiplication of a diagonal matrix
         missing keys in the pseudo diagonal matrix are pruned"""
 
         common_key =  set( self.keys() ) &  set( other.keys() )
+        ## how could I get the factory of the default dict ? 
         new_dict = VectorDict(VectorDict, dict() )
         for k in common_key:
-            if  hasattr( self[k], "homothetia") :
-                new_dict[k] = (self[k]).homothetia( other[k] )
+            if  hasattr( self[k], "__homothetia__") :
+                new_dict[k] = (self[k]).__homothetia__( other[k] )
             else:
                 new_dict[k] = self[k] * other[k]
         return new_dict
+    
     def dot(self, other):
         """scalar  = sum items self * other for each distinct key in common
         norm of the projection of self on other"""
@@ -660,15 +685,6 @@ class VectorDict(defaultdict):
 
             
 
-    def __imul__(integer, self):
-        if not isinstance(integer, int):
-            raise Exception("wrong type in dict multiplication")
-        #print "%r //%r" %  (self, integer)
-        another = self.copy()
-        #print "%r * %r " % (integer, another)
-        for k, v in self.iteritems():
-            another[k] = integer * v
-        return another
 
     def __sub__(self, other):
         """subber"""
@@ -683,27 +699,6 @@ class VectorDict(defaultdict):
                 positive[k] = -v
         return positive
 
-    def __rdiv__(self, scalar):
-        
-        #print "%r //%r" %  (self, integer)
-        another = self.copy()
-        if isinstance(scalar, VectorDict ):
-            return another.divide( scalar )
-        #print "%r * %r " % (integer, another)
-        for k, v in self.iteritems():
-            another[k] =  v / scalar
-        return another
-
-    def __rmul__(self, scalar):
-        #print "%r //%r" %  (self, integer)
-        another = self.copy()
-        if isinstance(scalar, VectorDict ):
-            return self.homothetia(scalar)
-            
-        #print "%r * %r " % (integer, another)
-        for k, v in self.iteritems():
-            another[k] = scalar * v
-        return another
 
     def __sub__(self, other):
         """subber"""
