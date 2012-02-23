@@ -239,7 +239,7 @@ class VectorDict(defaultdict):
 
  **Direct Match**
 
->>> a_tree = dict( 
+ >>> a_tree = dict( 
             b = dict( 
                 c = 3.0, 
                 d = dict( e = True)
@@ -626,12 +626,99 @@ class VectorDict(defaultdict):
         arg["flatten"] = arg.get("flatten", True)
         return iter_object(self,(),**arg )
 
+    def intersection( self, other):
+        """Return all elements common in two different trees
+        raise an exception if both leaves are different
+
+ >>> from vector_dict.VectorDict import convert_tree, VectorDict,Element,Path
+ >>> a = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 2  ) ) } )
+ >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, d = 1  ) ) } )
+ >>> a.intersection(b).tprint()
+ {
+     a = {
+         b = 1,
+     },
+ }
+ >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 1  ) ) } )
+ >>> a.intersection(b).tprint()
+ Traceback (most recent call last):
+   File "<input>", line 1, in <module>
+   File "vector_dict/VectorDict.py", line 634, in intersection
+     new_dict[k] = (self[k]).intersection( other[k] )
+   File "vector_dict/VectorDict.py", line 639, in intersection
+     other[k]
+ Exception: ('CollisionError', '2 != 1')
+ 
+
+"""
+        common_key =  set( self.keys() ) &  set( other.keys() )
+        new_dict = VectorDict(VectorDict, dict() )
+        for k in common_key:
+            if  hasattr( self[k], "intersection") :
+                new_dict[k] = (self[k]).intersection( other[k] )
+            else:
+                if self[k] != other[k]:
+                    raise Exception("CollisionError","%s != %s" % (  
+                            self[k] ,
+                            other[k]
+                        ) )
+                new_dict[k] = self[k]
+        return new_dict
+
+    def union(self, other):
+        """return the union of two dicts
+
+ >>> from vector_dict.VectorDict import convert_tree, VectorDict,Element,Path
+ >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 1  ) ) } )
+ >>> a = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, d = 2, c=1  ) ), 'e' :  1 } )
+ >>> b.union(a)
+ defaultdict(<type 'int'>, {'a': defaultdict(<type 'int'>, {'c': 1, 'b': 1, 'd': 2}), 'e': 1})
+ >>> a = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, d = 2, c=3  ) ) } )
+ >>> b.union(a)
+ Traceback (most recent call last):
+   File "<input>", line 1, in <module>
+   File "vector_dict/VectorDict.py", line 669, in union
+     return self + other - self.intersection(other)
+   File "vector_dict/VectorDict.py", line 658, in intersection
+     new_dict[k] = (self[k]).intersection( other[k] )
+   File "vector_dict/VectorDict.py", line 663, in intersection
+     other[k]
+ Exception: ('CollisionError', '1 != 3')
+ 
+
+"""
+        return - self.intersection(other) + self + other
     
-    
+    def symmetric_difference( self, other):
+        """ return elements present only elements in one of the dict
+        Throw a Collision Error if two leaves in each tree are different
+
+ >>> from vector_dict.VectorDict import convert_tree, VectorDict,Element,Path
+ >>> a = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, d = 2, c=1  ) ), 'e' :  1 } )
+ >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 1   ) ) } )
+ >>> a.symmetric_difference(b)
+ defaultdict(<type 'int'>, {'a': defaultdict(<type 'int'>, {'d': 2}), 'e': 1})
+ >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 2   ) ) } )
+ >>> a.symmetric_difference(b)
+ Traceback (most recent call last):
+   File "<input>", line 1, in <module>
+   File "vector_dict/VectorDict.py", line 694, in symmetric_difference
+     for path,v in self.intersection(other).as_vector_iter():
+   File "vector_dict/VectorDict.py", line 658, in intersection
+     new_dict[k] = (self[k]).intersection( other[k] )
+   File "vector_dict/VectorDict.py", line 663, in intersection
+     other[k]
+ Exception: ('CollisionError', '1 != 2')
+
+
+"""
+        new_dict = self + other
+        for path,v in self.intersection(other).as_vector_iter():
+            new_dict.prune( *path )
+        return new_dict
+
     def __internal_divide__(self, other):
-        """multiplying to vectors as one vector of homothetia * vector
-        it is a shortcut for a multiplication of a diagonal matrix
-        missing keys in the pseudo diagonal matrix are pruned"""
+        """dividing two vectors internaly"""
 
         common_key =  set( self.keys() ) &  set( other.keys() )
         ## how could I get the factory of the default dict ? 

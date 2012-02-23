@@ -23,7 +23,7 @@ test()
 
 setup(
         name='VectorDict',
-        version='0.4.1',
+        version='0.4.2',
         author='Julien Tayon',
         author_email='julien@tayon.net',
         packages=['vector_dict'],
