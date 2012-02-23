@@ -216,6 +216,79 @@ class TestVectorDict(unittest.TestCase):
             len(self.easy['ext'].keys()), 
             2
         )
-        
+    
+    def test_imul( self ):
+
+        a_copy = self.easy.copy()
+        self.easy *= -1
+        self.assertEqual(
+            self.easy['x'],
+            -a_copy['x']
+        )
+
+    def test_bug_1( self ):
+        """bug  #1 : * returns a copy where a reference is needed"""
+        pt = self.easy.at([])
+        pt *= -1
+        self.assertEqual(
+            self.easy,
+            pt
+        )
+
+    def test_bug_2( self ):
+        """bug #2 : self * other without affectation should not modify self.
+        """
+        self.easy *= -1
+        a_copy = self.easy.copy()
+        self.easy * a_copy
+        self.assertEqual(
+            self.easy,
+            a_copy
+        )
+
+    def test_bug_3( self ):
+        """bug  #3 : / returns a copy where a reference is needed"""
+        self.easy.prune( 'z' )
+        pt = self.easy.at([])
+        pt /= -1
+        self.assertEqual(
+            self.easy,
+            pt
+        )
+
+
+    def test_bug_4( self ):
+        """bug #4 : self / other without affectation should not modify self.
+        """
+        self.easy.prune( 'z' )
+        self.easy /= -1
+        a_copy = self.easy.copy()
+        self.easy / a_copy
+        self.assertEqual(
+            self.easy,
+            a_copy
+        )
+    
+
+    def test_bug_5( self ):
+        """bug #5 : int * dict without affectation should not modify self.
+        """
+        a_copy = self.easy.copy()
+        2 * self.easy
+        self.assertEqual(
+            self.easy,
+            a_copy
+        )
+    
+    def test_bug_6( self ):
+        """bug #6 : int / dict without affectation should not modify self.
+        """
+        self.easy.prune( 'z' )
+        a_copy = self.easy.copy()
+        2.0 / self.easy
+        self.assertEqual(
+            self.easy,
+            a_copy
+        )
 if __name__ == '__main__':
     unittest.main(verbosity=2)
