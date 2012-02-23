@@ -71,6 +71,9 @@ v 0.4.1
 
 v 0.4.2
     * BUG 1 to 6 squashed multiplication/division dont behave correctly    
+    * intersection, union, symmetric difference added in alpha version
+
+
         
 
 v 0.5.0
