@@ -18,6 +18,13 @@ STABLE
 SID (Still In Development)
     being polished and can only be used by the true warrior
 
+while in beta  convention is : 
+
+- **x** = 0 
+- **y** = API change
+- **z** = bugfix and/or improvement
+
+
 Path to world domination :
 **************************
 
@@ -62,11 +69,15 @@ v 0.4.1
     * adding QA information (such as where is the ticketing) in the documentation.
 
 
+v 0.4.2
+    * BUG 1 to 6 squashed multiplication/division dont behave correctly    
+        
 
 v 0.5.0
-    
+
     * adding read the doc git post commit hook
     * unittest with a better code coverage
+    * adding test_suite check before building sdist
 
 v 0.7.0 
     fully fonctionnal make chain
