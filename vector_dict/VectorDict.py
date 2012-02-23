@@ -831,7 +831,7 @@ class VectorDict(defaultdict):
         return positive
 
     def tformat(self, indent_level = 0, base_indent = 4):
-        """pretty printing in a tree like form à la Perl"""
+        """pretty printing in a tree like form a la Perl"""
         offset = " " *  indent_level * base_indent
         toreturn = '{\n'
         for k,v in self.iteritems():
