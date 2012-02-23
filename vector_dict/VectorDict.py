@@ -388,6 +388,7 @@ class VectorDict(defaultdict):
         """ Get a copy of an element at the coordinates given by the path
         Throw a KeyError excpetion if the path does not led to an element
  
+
  >>> intricated = convert_tree( { 'a' : { 'a' : { 'b' : { 'c' :  1 } } } } )
  >>> intricated.get_at( 'a', 'a', 'b' )
  defaultdict(<class 'vector_dict.VectorDict.VectorDict'>, {'c': 1})
