@@ -1,3 +1,7 @@
+
+http://readthedocs.org/docs/vectordict/
+
+
 I want to add addition to dict in python !
 
 It seems a long time ago in a faraway galaxy some wise men decided
