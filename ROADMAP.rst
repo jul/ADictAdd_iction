@@ -54,6 +54,9 @@ v 0.5.0
     * BUG 7 is not a bug
     * removing push
     * adding __and__, __or__, __not__
+    * set operations are Beta, don't use them
+    * refactoring + - * /
+    * doc refactoring
 
 
 
