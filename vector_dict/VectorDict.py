@@ -550,7 +550,7 @@ Throw a KeyError excpetion if the path does not led to an element
             self, other= other, self
         a_copy = copy and self.copy() or self
 
-        if isinstance(other, (float, int, complex)):
+        if not isinstance(other, VectorDict):
             for k, v in self.iteritems():
                 a_copy[k] = extern_operation( v , other)
             return a_copy
@@ -734,6 +734,8 @@ Throw a KeyError excpetion if the path does not led to an element
         common_key =  set( self.keys() ) &  set( other.keys() )
         new_dict = VectorDict(VectorDict, dict() )
         for k in common_key:
+        ## and what about sets ? 
+        ## try a key or value made of a forzen set
             if  hasattr( self[k], "intersection") :
                 new_dict[k] = (self[k]).intersection( other[k] )
             else:
@@ -766,6 +768,7 @@ Throw a KeyError excpetion if the path does not led to an element
  
 
 """
+    ###Dont work
         return - self.intersection(other) + self + other
     
     def symmetric_difference( self, other):
@@ -840,6 +843,16 @@ values
                 new_dict[k] = self[k] / other[k]
         return new_dict
 
+    def __internal_union__(self, other, copy = True):
+        """what to do when you do an union on two dicts ? """
+        common_key =  set( self.keys() ) &  set( other.keys() )
+        new_dict = copy and VectorDict( None, {} ) or self
+        for k in common_key:
+            if  hasattr( other[k], "__internal_union__") :
+                new_dict[k] = (self[k]).__internal_union__( other[k] )
+            else:
+                new_dict[k] = self[k] * other[k]
+
     def __internal_mul__(self, other):
         """multiplying to vectors as one vector of homothetia * vector
         it is a shortcut for a multiplication of a diagonal matrix
@@ -847,6 +860,7 @@ values
         
         common_key =  set( self.keys() ) &  set( other.keys() )
         ## how could I get the factory of the default dict ? 
+        ## hum hum, and what about in place modification ? 
         new_dict = VectorDict(VectorDict, dict() )
         for k in common_key:
             if  hasattr( self[k], "__internal_mul__") :
