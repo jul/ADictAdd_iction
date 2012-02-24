@@ -179,9 +179,9 @@ class ConsistentAlgebrae(object):
     def test_scalar_multiplication(self):
         """ an_int * a = a + ... + a (n times ) """
         left = self.scalar * self.one
-        right = self.one
+        right = self.one.copy()
         for i in xrange(self.scalar - 1):
-            right = right +  self.one
+            right +=  self.one
         return (left, right)
 
     @fixture_and_test

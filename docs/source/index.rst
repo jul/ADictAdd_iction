@@ -10,15 +10,16 @@ References :
 * online documentation : http://readthedocs.org/docs/vectordict/en/latest/
 * ticketing : https://github.com/jul/ADictAdd_iction/issues
 
-Vector Dict algebraic operation on rooted trees
-===============================================
+Manipulating dict of dict as trees pretty easily
+================================================
+
 Contents:
 
 
 .. toctree::
-    intro
     vector
     finding
+    algebrae
     matrix
     cl_op
     path

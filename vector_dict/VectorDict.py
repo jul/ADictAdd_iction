@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Dict behaving like a vector, and supporting all operations
-the algebraic way
-"""
+"""Dict on steroids """
 from collections import namedtuple, defaultdict
 from collections import Sequence, Mapping
 from math import sqrt
@@ -70,6 +68,7 @@ class Path(tuple):
 
     def startswith( self, *a_tuple ):
         """checks if a path starts with the value 
+
  >>> p = Path( [ 'a', 'b', 'c', 'd' ] )
  >>> p.startswith( 'a', 'b' )
  >>> True
@@ -219,8 +218,7 @@ def iter_object(obj, path=(), **opt):
             ] or ( path, obj )
 
 class VectorDict(defaultdict):
-    """Dict that supports all operations the way of vector does : 
-    + - / * dot, and operations with scalars"""
+    """slightly enhanced Dict"""
     def __init__(self, *a , **a_dict ):
         """Constructs like a collections.defaultdict (put sphinx ref)"""
         
@@ -375,20 +373,12 @@ class VectorDict(defaultdict):
         else:
             self.__delitem__( path[0] )
 
-    def push(self, path, value ):
-        """ pushing value at place given by path
-        will create the path if inexistent, 
-        alias for build_path, where last value of value if distinguished from 
-        path
-        Not pretty useful. 
-"""
-        self.build_path( path + [ v ] )
 
     def get_at(self, *path):
-        """ Get a copy of an element at the coordinates given by the path
-        Throw a KeyError excpetion if the path does not led to an element
- 
+        """Get a copy of an element at the coordinates given by the path
+Throw a KeyError excpetion if the path does not led to an element
 
+ >>> from vector_dict.VectorDict import convert_tree, VectorDict
  >>> intricated = convert_tree( { 'a' : { 'a' : { 'b' : { 'c' :  1 } } } } )
  >>> intricated.get_at( 'a', 'a', 'b' )
  defaultdict(<class 'vector_dict.VectorDict.VectorDict'>, {'c': 1})
@@ -396,11 +386,11 @@ class VectorDict(defaultdict):
  1
  >>> intricated.get_at( 'oops' )
  Traceback (most recent call last):
- File "<input>", line 1, in <module>
- File "vector_dict/VectorDict.py", line 304, in get_at
- return self.at( path, None , True)
- File "vector_dict/VectorDict.py", line 330, in at
- value = here[path[ -1 ] ]
+   File "<input>", line 1, in <module>
+   File "vector_dict/VectorDict.py", line 304, in get_at
+     return self.at( path, None , True)
+   File "vector_dict/VectorDict.py", line 330, in at
+     value = here[path[ -1 ] ]
  KeyError: 'oops'
  
  """
@@ -411,6 +401,7 @@ class VectorDict(defaultdict):
         gets to the mentioned path eventually apply a lambda on the value
         and return the node, 
         and copy it if mentioned. 
+
  >>> intricated = convert_tree( { 'a' : { 'a' : { 'b' : { 'c' :  1 } } } } )
  >>> pt = intricated.at( ( 'a', 'a', 'b' ) )
  >>> pt
@@ -627,6 +618,93 @@ class VectorDict(defaultdict):
         arg["flatten"] = arg.get("flatten", True)
         return iter_object(self,(),**arg )
 
+    def __not__(self):
+        """ not on all leaves of the dict
+
+ >>> from vector_dict.VectorDict import convert_tree, VectorDict,Element,Path
+ >>> a = convert_tree(dict(a = dict(tt=True, tf=True, ft=False, ff=False), c= False))
+ >>> a.__not__().tprint()
+ {
+     a = {
+         tf = False,
+         tt = False,
+         ft = True,
+         ff = True,
+     },
+     c = True,
+ }
+ >>> a.tprint()
+ {
+     a = {
+         tf = True,
+         tt = True,
+         ft = False,
+         ff = False,
+     },
+     c = False,
+ }
+
+"""
+
+        new_dict=self.copy()
+        for k, v in new_dict.iteritems():
+            if not isinstance(v, VectorDict):
+                new_dict[k] = not v
+            else:
+                new_dict[k] = v.__not__()
+        return new_dict
+
+
+    def __or__(self,other):
+        """or on all leaves
+
+ >>> b = convert_tree(dict(a = dict(tt=True, tf=False, ft=True, ff=False), b= True))
+ >>> a = convert_tree(dict(a = dict(tt=True, tf=True, ft=False, ff=False), c= False))
+ >>> ( b | a).tprint()
+ {
+     a = {
+         tf = True,
+         tt = True,
+         ft = True,
+         ff = False,
+     },
+     c = False,
+     b = True,
+ }
+"""
+
+        new_dict = self.copy()
+        common_key = set( self.keys() ) & set(other.keys() )
+        for k in common_key:
+                new_dict[k] = (self[k]).__or__( other[k] )
+        for k in set( other.keys()) - common_key:
+            new_dict[k] =  other[k] 
+            
+        return new_dict
+
+    def __and__(self,other):
+        """and on all leaves
+
+ >>> b = convert_tree(dict(a = dict(tt=True, tf=False, ft=True, ff=False), b= True))
+ >>> a = convert_tree(dict(a = dict(tt=True, tf=True, ft=False, ff=False), c= False))
+ >>> ( b & a).tprint()
+ {
+     a = {
+         tf = False,
+         tt = True,
+         ft = False,
+         ff = False,
+     },
+ }
+"""
+
+        common_key =  set( self.keys() ) &  set( other.keys() )
+        new_dict = VectorDict(VectorDict, dict() )
+        for k in common_key:
+                new_dict[k] = (self[k]).__and__( other[k] )
+        return new_dict
+
+        
     def intersection( self, other):
         """Return all elements common in two different trees
         raise an exception if both leaves are different
@@ -652,6 +730,7 @@ class VectorDict(defaultdict):
  
 
 """
+
         common_key =  set( self.keys() ) &  set( other.keys() )
         new_dict = VectorDict(VectorDict, dict() )
         for k in common_key:
@@ -665,7 +744,6 @@ class VectorDict(defaultdict):
                         ) )
                 new_dict[k] = self[k]
         return new_dict
-
     def union(self, other):
         """return the union of two dicts
 
@@ -717,6 +795,7 @@ class VectorDict(defaultdict):
         for path,v in self.intersection(other).as_vector_iter():
             new_dict.prune( *path )
         return new_dict
+
     def issubset( self, other ):
         """tells if all element of self are included in other
 
@@ -728,13 +807,14 @@ class VectorDict(defaultdict):
  >>> a.issubset(b)
  False
 
-        """
+"""
         return self.intersection(other) == self
 
     def issuperset(self, other):
         """tells if all element of other is included in self
-        throws an exception if two leaves in the two trees have different 
-        values
+throws an exception if two leaves in the two trees have different 
+values
+
  >>> from vector_dict.VectorDict import convert_tree, VectorDict,Element,Path
  >>> a = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, d = 2, c=1  ) ), 'e' :  1 } )
  >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 1   ) ) } )
@@ -742,6 +822,7 @@ class VectorDict(defaultdict):
  True
  >>> b.issuperset(a)
  False
+
 """
 
         return self.union(other) == self
@@ -791,6 +872,7 @@ class VectorDict(defaultdict):
         a . b / ( ||a||*||b|| )
         """
         return 1.0 * self.dot( other) / self.norm() / other.norm()
+
     def jaccard(self, other):
         """jaccard similariry of two vectors dicts
         a . b  / ( ||a||^2 + ||b||^2 - a . b )
@@ -801,8 +883,6 @@ class VectorDict(defaultdict):
             self.dot(other) 
         )
 
-            
-
 
     def __sub__(self, other):
         """subber"""
@@ -818,18 +898,6 @@ class VectorDict(defaultdict):
         return positive
 
 
-    def __sub__(self, other):
-        """subber"""
-        positive = self.copy()
-        negative = other
-        neg_key = set(negative.keys())
-        pos_key = set(positive.keys())
-        for k, v in negative.iteritems():
-            if k in positive.keys():
-                positive[k] -= v
-            else:
-                positive[k] = -v
-        return positive
 
     def tformat(self, indent_level = 0, base_indent = 4):
         """pretty printing in a tree like form a la Perl"""
@@ -846,6 +914,7 @@ class VectorDict(defaultdict):
         return toreturn 
 
     def tprint( self, indent_level = 0, base_indent = 4):
+        """pretty printing with indentation in tradiotionnal fashion"""
         print self.tformat( indent_level, base_indent )
  
     def pprint(self):

@@ -2,8 +2,15 @@
 Vector Dict
 ===========
 
+Manipulating dict of dict as trees with :
 
-.. automodule:: vector_dict.VectorDict
+* set operations
+* logical operations
+* algebraic behaviour 
+* tree manipulations
+* search operation
+* metrics of similarities
+* vector algebrae
 
 
 
@@ -15,13 +22,38 @@ Helpers
 .. autoclass:: vector_dict.VectorDict.convert_tree
 
 
-Complete API
-************
+.. autoclass:: vector_dict.VectorDict.VectorDict
+    :members: tprint, pprint, tformat
 
+Set Operations
+**************
 
 .. autoclass:: vector_dict.VectorDict.VectorDict
-    :members:
+    :members: intersection, symmetric_difference, union, issubset, issuperset
 
+Logical Operations
+******************
+
+.. autoclass:: vector_dict.VectorDict.VectorDict
+    :members: __and__, __or__, __not__
+
+Iterators
+*********
+
+.. autoclass:: vector_dict.VectorDict.VectorDict
+    :members: as_vector_iter, as_row_iter
+
+Accessing and modifying
+***********************
+
+.. autoclass:: vector_dict.VectorDict.VectorDict
+    :members: at, get_at, prune, find, build_path
+
+Metrics
+*******
+
+.. autoclass:: vector_dict.VectorDict.VectorDict
+    :members: norm, dot, jaccard, cos
 
 
 Aliases
@@ -35,8 +67,8 @@ Aliases
 exemples
 ********
 
-Making summation in jquery like structures
-------------------------------------------
+Making map reduce in mongodb fashion
+------------------------------------
 
 .. literalinclude:: ../../example/demonstrate.py
    :lines: 20-
