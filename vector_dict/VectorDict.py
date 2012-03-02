@@ -709,6 +709,9 @@ Throw a KeyError excpetion if the path does not led to an element
         """Return all elements common in two different trees
         raise an exception if both leaves are different
 
+        #TOFIX : dont make a newdict if doing in place operations
+
+
  >>> from vector_dict.VectorDict import convert_tree, VectorDict,Element,Path
  >>> a = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 2  ) ) } )
  >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, d = 1  ) ) } )
@@ -746,7 +749,8 @@ Throw a KeyError excpetion if the path does not led to an element
                         ) )
                 new_dict[k] = self[k]
         return new_dict
-    def union(self, other):
+    
+    def union(self, other, intersection=None):
         """return the union of two dicts
 
  >>> from vector_dict.VectorDict import convert_tree, VectorDict,Element,Path
@@ -769,7 +773,30 @@ Throw a KeyError excpetion if the path does not led to an element
 
 """
     ###Dont work
-        return - self.intersection(other) + self + other
+        #return - self.intersection(other) + self + other
+        ## take  intersection 
+        union  = intersection and intersection or self.intersection(other)
+        ## add self not in intersection
+        ### easy case
+        common_keys = set( union.keys() ) 
+        orthogonal_keys_self = set( union.keys() ) - set( self.keys() )
+        orthogonal_keys_other = set( union.keys() ) - set( other.keys() )
+
+        for k in orthogonal_keys_self:
+
+            union[k] = self[k]
+        
+        for k in orthogonal_keys_other:
+
+            union[k] = other[k]
+        for k in common_keys:
+            if not self[k] == other[k]:
+                union[k] = self[k].union(other[k], intersection and intersection.get(k) or dict()  )
+        return union
+        ### stinking case 
+        
+        ## add other not intersaction
+        ## return 
     
     def symmetric_difference( self, other):
         """ return elements present only elements in one of the dict
