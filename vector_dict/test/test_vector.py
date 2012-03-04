@@ -290,5 +290,92 @@ class TestVectorDict(unittest.TestCase):
             self.easy,
             a_copy
         )
+    def test_union_func_not_ok(self):
+        a_lot_of_type= convert_tree( 
+            dict( 
+                a = "lkjlkjl",
+                b = dict( 
+                    e = set( [ 1 , 2 , 3 ] ),
+                    f = lambda x ,y : 2 * y,
+                
+                ),
+                p = dict(a  = "saint" )
+            )
+        )
+        another_lot = convert_tree( 
+            dict( a = "lkjlkjl",
+                b = dict( 
+                    e = set( [ 1 , 2 , 3 ] ),
+                    f = lambda x ,y : 2 * y,
+                    g = dict(),
+                ),
+                pp = dict(a  = "serre" )
+            ),
+        )
+        cl = Exception('CollisionError','')
+        
+        self.assertRaises(
+        Exception,
+        a_lot_of_type.union, another_lot
+        )
+    def test_union_ok( self):
+        a_lot_of_type= convert_tree( 
+            dict( 
+                a = "lkjlkjl",
+                b = dict( 
+                    e = set( [ 1 , 2 , 3 ] ),
+                    f = 123.123123123,
+                
+                ),
+                p = dict(a  = "saint" )
+            )
+        )
+        another_lot = convert_tree( 
+            dict( a = "lkjlkjl",
+                b = dict( 
+                    h = "fuck",
+                    i = dict( a = 1 ),
+                    e = set( [ 1 , 2 , 3, 5 ] ),
+                    f = 123.123123123,
+                    g = dict(),
+                ),
+                pp = dict(a  = "serre" )
+            ),
+        )
+        un= a_lot_of_type.union(another_lot)
+        expected = convert_tree( {
+    'a' : 'lkjlkjl',
+    'p' : {
+        'a' : 'saint',
+    },
+    'pp' : {
+        'a' : 'serre',
+    },
+    'b' : {
+        'i' : {
+            'a' : 1,
+        },
+        'e' : set([1, 2, 3, 5]),
+        'g' : {
+        },
+        'f' : 123.123123123,
+    },
+})
+
+        self.assertEqual( 
+            un,
+            expected) 
+    
+    def test_bug_convert_empty_mapping( self ):
+        """bug #8 : empty mapping intialisation dont work"""
+        bug = convert_tree( dict( a = {} ) )
+        expected  = VectorDict(None, {'a': {}})
+        
+        self.assertEqual( 
+            expected,
+            bug
+
+        )
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

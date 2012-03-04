@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-.. module:: finding_example
-   :platform: Unix, Windows
-   :synopsis: finding a dict in an encyclopedia
-
-   .. moduleauthor:: Julien Tayon
+.. module:: yep
 """
 
 

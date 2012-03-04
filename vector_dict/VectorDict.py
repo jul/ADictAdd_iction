@@ -22,11 +22,11 @@ def convert_tree(a_tree):
 
  >>> convert_tree({ 'a' : { 'a' : { 'r' : "yop", 'b' : { 'c' :  1 }}}}).tprint()
  {
-     a = {
-         a = {
-             r = 'yop',
-             b = {
-                 c = 1,
+     a : {
+         a : {
+             r : 'yop',
+             b : {
+                 c : 1,
              },
          },
      },
@@ -144,9 +144,9 @@ def tree_from_path( *path ):
 
  >>> tree_from_path( 'a', 'b', 'c', 1  ).tprint()
  {
-     a = {
-         b = {
-             c = 1,
+     a : {
+         b : {
+             c : 1,
          },
      },
  }
@@ -190,14 +190,20 @@ def iter_object_nl(obj, path=(), **opt):
      http://tech.blog.aknin.name/2011/12/11/walking-python-objects-recursively/
     """
 
-    if isinstance(obj, Mapping):
-        for key, value in obj.iteritems():
-            for child in iter_object_nl(value, path + (key,), **opt):
-                yield  child
+    if isinstance( obj, Mapping ):
+        if len(obj):
+       
+            for key, value in obj.iteritems():
+                for child in iter_object_nl(value, path + (key,), **opt):
+                    yield  child
+        else:
+            yield list(path) + [ obj ]
+            
     else:
-        yield  opt.get("flatten") and  [
-                x for x in flattening(  path)  
-            ] + [   obj ]  or ( path, obj )
+        if opt.get("flatten"):
+            yield [ x for x in flattening( path)  ] + [ obj ]
+        else:
+            yield (path, obj)
 
 def iter_object(obj, path=(), **opt):
     """
@@ -209,9 +215,13 @@ def iter_object(obj, path=(), **opt):
     """
 
     if isinstance(obj, Mapping):
-        for key, value in obj.iteritems():
-            for child in iter_object(value, path + (key,), **opt):
-                yield  child
+        if len(obj):
+            for key, value in obj.iteritems():
+                for child in iter_object(value, path + (key,), **opt):
+                    yield  child
+        else:
+            yield (path, obj )
+
     else:
         yield  opt.get("flatten") and [ 
                 x for x in flattening( ( path, obj) ) 
@@ -315,13 +325,13 @@ class VectorDict(defaultdict):
  >>> a.build_path( 'd', 'f',  4  )
  >>> a.tprint()
  {
-     k = 1,
-     b = {
-         n = [1],
+     k : 1,
+     b : {
+         n : [1],
      },
-     d = {
-         e = 2,
-         f = 4,
+     d : {
+         e : 2,
+         f : 4,
      },
  }
 
@@ -352,16 +362,16 @@ class VectorDict(defaultdict):
  >>> a.build_path( 'g', 'tokeep' , True )
  >>> a.tprint()
  {
-     g = {
-         tokeep = True,
-         todel = True,
+     g : {
+         tokeep : True,
+         todel : True,
      },
  }
  >>> a.prune( 'g', 'todel' )
  >>> a.tprint()
  {
-     g = {
-         tokeep = True,
+     g : {
+         tokeep : True,
      },
  }
 
@@ -409,10 +419,10 @@ Throw a KeyError excpetion if the path does not led to an element
  >>> pt['c'] = 2
  >>> intricated.tprint()
  {
-    a = {
-        a = {
-            b = {
-                c = 2,
+    a : {
+        a : {
+            b : {
+                c : 2,
             },
         },
     },
@@ -601,11 +611,11 @@ Throw a KeyError excpetion if the path does not led to an element
  >>> a = convert_tree({ 'a' : { 'a' : { 'r' : "yop" , 'b' : { 'c' :  1 }}}})
  >>> a.tprint()
  {
-     a = {
-         a = {
-             r = 'yop',
-             b = {
-                 c = 1,
+     a : {
+         a : {
+             r : 'yop',
+             b : {
+                 c : 1,
              },
          },
      },
@@ -625,23 +635,23 @@ Throw a KeyError excpetion if the path does not led to an element
  >>> a = convert_tree(dict(a = dict(tt=True, tf=True, ft=False, ff=False), c= False))
  >>> a.__not__().tprint()
  {
-     a = {
-         tf = False,
-         tt = False,
-         ft = True,
-         ff = True,
+     a : {
+         tf : False,
+         tt : False,
+         ft : True,
+         ff : True,
      },
-     c = True,
+     c : True,
  }
  >>> a.tprint()
  {
-     a = {
-         tf = True,
-         tt = True,
-         ft = False,
-         ff = False,
+     a : {
+         tf : True,
+         tt : True,
+         ft : False,
+         ff : False,
      },
-     c = False,
+     c : False,
  }
 
 """
@@ -662,14 +672,14 @@ Throw a KeyError excpetion if the path does not led to an element
  >>> a = convert_tree(dict(a = dict(tt=True, tf=True, ft=False, ff=False), c= False))
  >>> ( b | a).tprint()
  {
-     a = {
-         tf = True,
-         tt = True,
-         ft = True,
-         ff = False,
+     a : {
+         tf : True,
+         tt : True,
+         ft : True,
+         ff : False,
      },
-     c = False,
-     b = True,
+     c : False,
+     b : True,
  }
 """
 
@@ -689,11 +699,11 @@ Throw a KeyError excpetion if the path does not led to an element
  >>> a = convert_tree(dict(a = dict(tt=True, tf=True, ft=False, ff=False), c= False))
  >>> ( b & a).tprint()
  {
-     a = {
-         tf = False,
-         tt = True,
-         ft = False,
-         ff = False,
+     a : {
+         tf : False,
+         tt : True,
+         ft : False,
+         ff : False,
      },
  }
 """
@@ -704,7 +714,24 @@ Throw a KeyError excpetion if the path does not led to an element
                 new_dict[k] = (self[k]).__and__( other[k] )
         return new_dict
 
-        
+    def __xor__(self,other):
+        """xor on all leaves 
+ >>> b = convert_tree(dict(a = dict(tt=True, tf=False, ft=True, ff=False), b= True))
+ >>> a = convert_tree(dict(a = dict(tt=True, tf=True, ft=False, ff=False), c= False))
+ >>> ( b ^ a).tprint()
+ {
+     'a' : {
+         'tf' : False,
+         'tt' : True,
+         'ft' : False,
+         'ff' : True,
+     },
+ }
+"""
+
+
+        return (  self.__not__() & other ) | ( other.__not__() & self )
+
     def intersection( self, other):
         """Return all elements common in two different trees
         raise an exception if both leaves are different
@@ -717,8 +744,8 @@ Throw a KeyError excpetion if the path does not led to an element
  >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, d = 1  ) ) } )
  >>> a.intersection(b).tprint()
  {
-     a = {
-         b = 1,
+     a : {
+         b : 1,
      },
  }
  >>> b = VectorDict( int, { 'a' : VectorDict( int, dict( b = 1, c = 1  ) ) } )
@@ -748,7 +775,7 @@ Throw a KeyError excpetion if the path does not led to an element
                             other[k]
                         ) )
                 new_dict[k] = self[k]
-        return new_dict
+        return new_dict or VectorDict()
     
     def union(self, other, intersection=None):
         """return the union of two dicts
@@ -775,28 +802,32 @@ Throw a KeyError excpetion if the path does not led to an element
     ###Dont work
         #return - self.intersection(other) + self + other
         ## take  intersection 
-        union  = intersection and intersection or self.intersection(other)
+        union  = intersection or self.intersection(other)
         ## add self not in intersection
         ### easy case
+
         common_keys = set( union.keys() ) 
-        orthogonal_keys_self = set( union.keys() ) - set( self.keys() )
-        orthogonal_keys_other = set( union.keys() ) - set( other.keys() )
+        orthogonal_keys_self = set(self).symmetric_difference( set( union.keys() ))
+        orthogonal_keys_other = set(other).symmetric_difference( set( union.keys() ) )
+
 
         for k in orthogonal_keys_self:
-
-            union[k] = self[k]
+            if not is_leaf(self[k]):
+                union[k] += self[k]
+            else:
+               raise( Exception("Wtf?") )
         
         for k in orthogonal_keys_other:
+            if not is_leaf(other[k]):
+                union[k] += other[k]
 
-            union[k] = other[k]
         for k in common_keys:
             if not self[k] == other[k]:
-                union[k] = self[k].union(other[k], intersection and intersection.get(k) or dict()  )
+                if isinstance(union[k], VectorDict) :
+                    union[k] = self[k].union(other[k], intersection and intersection.get(k) or VectorDict()  )
+                else: 
+                    union[k] = self[k].union(other[k])
         return union
-        ### stinking case 
-        
-        ## add other not intersaction
-        ## return 
     
     def symmetric_difference( self, other):
         """ return elements present only elements in one of the dict
@@ -945,7 +976,8 @@ values
         offset = " " *  indent_level * base_indent
         toreturn = '{\n'
         for k,v in self.iteritems():
-            toreturn += offset + ( " " * base_indent ) +  '%s = ' % k
+            toreturn += offset + ( " " * base_indent ) +  '%s : ' %( 
+                repr(k) or '<BUG>')
             if hasattr( v, "tformat"):
                 toreturn += v.tformat( indent_level+1, base_indent )
             else:
@@ -957,14 +989,16 @@ values
     def tprint( self, indent_level = 0, base_indent = 4):
         """pretty printing with indentation in tradiotionnal fashion"""
         print self.tformat( indent_level, base_indent )
- 
+
+    def pformat(self):
+        return  "\n".join( [ 
+                    "%s = %s" % (
+                        "->".join( map(unicode, x[0])), 
+                       isinstance( x[1], ( str, unicode) ) and ( "'%s'" % x[1] ) or repr(x[1])  
+                    ) for x in self.as_vector_iter() ] )
     def pprint(self):
         """ pretty printing the VectorDict in flattened vectorish representation"""
-        print "\n".join( [ 
-                    "%s = %s" % (
-                        "->".join( map(unicode, k)), 
-                       isinstance( v, ( str, unicode) ) and ( "'%s'" % v ) or repr(v)  
-                    ) for k, v in self.as_vector_iter() ] )
+        print self.pformat() 
                 
     def __add__(left1, left2):
         """adder"""

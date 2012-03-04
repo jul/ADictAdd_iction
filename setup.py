@@ -23,15 +23,14 @@ test()
 
 setup(
         name='VectorDict',
-        version='0.5.0',
+        version='0.6.0',
         author='Julien Tayon',
         author_email='julien@tayon.net',
         packages=['vector_dict'],
         url='http://readthedocs.org/docs/vectordict/en/latest/',
         license='LICENSE.txt',
-        test_suite='vector_dict.test.test_VectorDict',
-        test='vector_dict.test.test_VectorDict',
-        description='Implementing vector algebra on tree',
+        test_suite='vector_dict.test.test_vector',
+        description='dict with recursive operations (algebraic, set, logicial)',
         requires=[
         "collections","math"
         ],

@@ -10,22 +10,22 @@ Pretty sanely it is a leaf by leaf operation, and will work as long as element s
  >>> (a+a).tprint()
  {
      a = {
-         aint = 2,
-         anarray = [1, 2, 1, 2],
-         astring = 'yoyo',
-         afloat = 4.0,
+         aint : 2,
+         anarray : [1, 2, 1, 2],
+         astring : 'yoyo',
+         afloat : 4.0,
      },
      c = 0,
  }
  >>> (a*2).tprint()
  {
-     a = {
-         aint = 2,
-         anarray = [1, 2, 1, 2],
-         astring = 'yoyo',
-         afloat = 4.0,
+     a : {
+         aint : 2,
+         anarray : [1, 2, 1, 2],
+         astring : 'yoyo',
+         afloat : 4.0,
      },
-     c = 0,
+     c : 0,
  }
  >>> (a*a).tprint()
  #Traceback (most recent call last):
@@ -47,38 +47,38 @@ It also works (in the rules of conservation) by creating new path/value in the n
  >>> b = convert_tree(dict(a = dict(x=-1.0, y=2.0, z=6), d= 1))
  >>> (a+b).tprint()
  {
-     a = {
-         y = 4.0,
-         x = 0.0,
-         z = 9,
+     a : {
+         y : 4.0,
+         x : 0.0,
+         z : 9,
      },
-     c = 1,
-     d = 1,
+     c : 1,
+     d : 1,
  }
  >>> (a*b).tprint()
  {
-     a = {
-         y = 4.0,
-         x = -1.0,
-         z = 18,
+     a : {
+         y : 4.0,
+         x : -1.0,
+         z : 18,
      },
  }
  >>> (a-b).tprint()
  {
-     a = {
-         y = 0.0,
-         x = 2.0,
-         z = -3,
+     a : {
+         y : 0.0,
+         x : 2.0,
+         z : -3,
      },
-     c = 1,
-     d = -1,
+     c : 1,
+     d : -1,
  }
  >>> (1.0*a/b).tprint()
  {
-     a = {
-         y = 1.0,
-         x = -1.0,
-         z = 0.5,
+     a : {
+         y : 1.0,
+         x : -1.0,
+         z : 0.5,
      },
  }
 

@@ -1,3 +1,5 @@
+include vector_dict/test/test_vector.py
+include vector_dict/test/test.py
 include vector_dict/*py
 include example/*py
 include README

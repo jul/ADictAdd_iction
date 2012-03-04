@@ -23,13 +23,13 @@ As path is of the Path class, you can use *endswith*, *startswith* and *countain
  a->a->d = True
  >>> a.tprint()
  {
-     a = {
-         a = {
-             r = 'yop',
-             b = {
-                 c = 1,
+     a : {
+         a : {
+             r : 'yop',
+             b : {
+                 c : 1,
              },
-             d = True,
+             d : True,
          },
      },
  }
@@ -63,15 +63,15 @@ If you dont want any answers returned in the form of a tree add the is_leaf clau
  [Element(path=('a', 'a', 'r'), value='yop'), Element(path=('a', 'a', 'b', 'c'), value=1), Element(path=('a', 'a', 'd'), value=True), Element(path=('a', 'a', 'g', 'a'), value=2)]
  >>> a.tprint()
  {
-     a = {
-         a = {
-             r = 'yop',
-             b = {
-                 c = 1,
+     a : {
+         a : {
+             r : 'yop',
+             b : {
+                 c : 1,
              },
-             d = True,
-             g = {
-                 a = 2,
+             d : True,
+             g : {
+                 a : 2,
              },
          },
      },
@@ -100,15 +100,15 @@ Also with at you can manipulate values :
  [-10, 10]
  >>> a.tprint()
  {
-     a = {
-         y = 2,
-         x = -10,
-         z = 3,
+     a : {
+         y : 2,
+         x : -10,
+         z : 3,
      },
-     b = {
-         y = -1,
-         x = 10,
-         z = -2,
+     b : {
+         y : -1,
+         x : 10,
+         z : -2,
      },
  }
 
