@@ -48,3 +48,27 @@ which would be equivalent to state **None = False** but python says :
  
 or 
 
+
+* if not defined value, dont guess and I'll prune all paths that are not define
+
+or 
+
+* raise **TypeError Exception** for unsupported type (empty path vs known path)
+
+
+
+Almost complete support for set operation
+*****************************************
+
+We have a problem inherent with python not being able to tell if two
+functions shares same code and context. func1 == func2 is synonym they are in t
+
+So set operations will fail in case you use functions. 
+
+
+.. warning:
+   This is not a bug but a feature, when I do tree.union(tree2), if leaves supp
+   It is the same behaviour with all operations. 
+
+
+
