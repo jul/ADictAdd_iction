@@ -289,12 +289,12 @@ class VectorDict(defaultdict):
                     else:
                     ## it is not a clause
                         val = self.get(k)
+                        ## BUG not all leaves are supposed to support -
                         if  is_leaf(val):
-                        ## terminating values match
-                            match_to_find -= v ==  val and 1 or 0
+                            match_to_find -=  v == val  and 1 or 0
                         else:
-                        ## the compared tree goes on, we match the keys
                             match_to_find -=  v in val  and 1 or 0
+
                 else:
                     ## the comparison tree goes on
                     sub_tree = self.get(k)
@@ -1024,55 +1024,3 @@ values
         #print "self %r" % self
         return self
 
-if '__main__' == __name__:
-    print "undestranding 2 * array"
-    from numpy import array, ndarray
-   # def tracing(callme):
-   #     def wrapper(callme):
-   #         call_my_name = callme.__name__ or "oops"
-   #         call_arg = "%r / %r" % (a, kw)
-   #         print "IN: %r(%r)" % (call_my_name, call_arg)
-   #         try:
-   #             res = callme(*a, **kw)
-   #         except Exception as e:
-   #             print "OUT: E  %r" %  e
-   #         print "OUT: %r => %r" % (callme, res)
-   #         return result
-   #     return wrapper
-   # for method in VectorDict.__dict__.keys():
-   #     if method.startswith("__"):
-   #         print "%r " % (method,)
-   #         setattr(int, method, tracing(method))
-
-    print u"testing"
-
-    a = VectorDict(VectorDict, {'FR': VectorDict(VectorDict,
-        VectorDict(array, {'paris': array([1, 3])}))})
-
-    print u"testing"
-    a += VectorDict(
-            VectorDict, {
-                'FR': VectorDict(
-                    VectorDict, VectorDict(
-                            array, {'paris': array([1, 3])}
-                       )
-                   )
-           }
-       )
-    b = VectorDict(
-            VectorDict, {
-                'FR':
-                 VectorDict(VectorDict,
-                        VectorDict(
-                            array, {'lyon': array([1, 3])}
-                       )
-                    )
-               }
-          )
-    print "%r" % a
-    print "****%r" % b
-    b.pprint()
-    a += b
-    for el in iter_object(a):
-        print "<%r>" % (el or "",)
-    print "%r" % "-".join( [ repr(k) for k,v in a.as_vector_iter() ] )

@@ -376,6 +376,16 @@ class TestVectorDict(unittest.TestCase):
             bug
 
         )
+    def test_bug_boolean_not_commutative(self):
+        """bug #9: a xor b != ! ( a xand b )"""
+        a = VectorDict( lambda : False, 
+            dict( tt = True, tf = True, ft=False, ff = False, not_in_b=False) 
+        )
+        b = VectorDict( lambda : False, 
+            dict( tt = True, tf = False, ft=True, ff = False, not_in_a = True) 
+        )
+        self.assertEqual( ( a & b.__not__() ) | ( a.__not__() & b) , 
+            ( ( a | b.__not__() ) & ( a.__not__() | b )).__not__() )
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
