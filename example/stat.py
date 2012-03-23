@@ -4,6 +4,10 @@
 """
 Calculates the total number of downloads that a particular PyPI package has
 received across all versions tracked by PyPI
+author : codekoala (not me)
+License : ask codekoala
+source : http://www.codekoala.com/blog/2010/pypi-download-stats/
+Added a save method
 """
 
 from datetime import datetime
