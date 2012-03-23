@@ -4,10 +4,6 @@
 """
 Calculates the total number of downloads that a particular PyPI package has
 received across all versions tracked by PyPI
-author : codekoala (not me)
-License : ask codekoala
-source : http://www.codekoala.com/blog/2010/pypi-download-stats/
-Added a save method
 """
 
 from datetime import datetime
@@ -128,8 +124,8 @@ Possible matches include:
         result = load(open(save))
         ## would be better
         ## delete all existing entry for the existing date
-        result = filter( lambda r : r["name"] != self.package_name  and
-            str(r["date"]) != str(date.today() ),
+        result = filter( lambda r : r["name"] != self.package_name or 
+            r["date"] != str(date.today() ),
             result )
         result += [  json ]
         print dumps(result, indent=4)
