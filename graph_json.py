@@ -39,9 +39,12 @@ days = DayLocator()
 total_plot = len(res)
 under_graph=(0,-.25)
 
+
 for cursor, (name, data) in enumerate(res.iteritems()):
     ax = fig.add_subplot( 1, total_plot, cursor+1)
-    ax.plot_date( data["date"], data["dl"],  '-' )
+    ## dont plot line till I dont know how to sort asc both arrays
+    ## well it is monotonic and growing
+    ax.plot_date( sorted(data["date"]), sorted(data["dl"]),  'o-' )
 
     ax.xaxis.set_major_locator(days)
     ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d') )
@@ -51,5 +54,6 @@ for cursor, (name, data) in enumerate(res.iteritems()):
 
     ax.set_title( "%s for package %s" % ("total_dl", name) )
     fig.autofmt_xdate()
+    print data
 plt.show()
 
