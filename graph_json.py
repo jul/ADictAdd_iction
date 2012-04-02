@@ -32,6 +32,9 @@ print len(res)
 res.tprint()
 
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter,DayLocator
+### make an autoadpative marker for tick and min/max/interm formaters according
+### to date range
+
 years    = YearLocator()   # every year
 months   = MonthLocator()  # every month
 yearsFmt = DateFormatter('%Y')
@@ -42,9 +45,7 @@ under_graph=(0,-.25)
 
 for cursor, (name, data) in enumerate(res.iteritems()):
     ax = fig.add_subplot( 1, total_plot, cursor+1)
-    ## dont plot line till I dont know how to sort asc both arrays
-    ## well it is monotonic and growing
-    ax.plot_date( sorted(data["date"]), sorted(data["dl"]),  'o-' )
+    ax.plot_date( data["date"], data["dl"],  'o-' )
 
     ax.xaxis.set_major_locator(days)
     ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d') )
