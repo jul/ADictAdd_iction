@@ -43,5 +43,16 @@ def word_count( unicode_file ):
 
 p = Pool()
 result=p.map(word_count, FILES )
-reduce(vd.__add__,result)['begin_with'].tprint()
+result = reduce(vd.__add__,result)
+print "Frequency of words begining with"
+result['begin_with'].tprint()
+result.prune( "begin_with")
+from itertools import islice
+print "TOP 40 most used words"
+print "\n".join(
+     "%10s=%s" % (x, y) for x, y in sorted(result.items(), key=lambda x: x[1],reverse=True)[:40] 
+    
+)
+
+
 
