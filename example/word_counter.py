@@ -28,8 +28,8 @@ import re
 #from codecs import open as open
 
 from vector_dict.VectorDict import VectorDict as vd
-FILES = [ "dorian_splited.aa",  "dorian_splited.ab",
-        "dorian_splited.ac",  "dorian_splited.ad" ]
+FILES = [ "../dorian_splited.aa",  "../dorian_splited.ab",
+        "../dorian_splited.ac",  "../dorian_splited.ad" ]
 
 
 def word_count( unicode_file ):
@@ -63,7 +63,7 @@ result = reduce(vd.__add__,result)
 print "Frequency of words begining with"
 result['begin_with'].tprint()
 result.prune( "begin_with")
-print "Repartition of size words size"
+print "Repartition of words size"
 result['has_size'].tprint()
 result.prune( "has_size")
 
