@@ -9,6 +9,18 @@ unlike regular word count methods"""
 # mv pg26740.txt dorian.txt 
 # split -l 2125 dorian.txt dorian_splited.
 
+import os, sys, inspect
+cmd_folder = os.path.abspath(
+    os.path.join(
+        os.path.split(
+            inspect.getfile( inspect.currentframe() )
+        )[0] ,
+        ".."
+    )
+)
+if cmd_folder not in sys.path:
+   sys.path.insert(0, cmd_folder)
+
 
 from multiprocessing import Pool
 import string
@@ -29,16 +41,20 @@ def word_count( unicode_file ):
         return _clean
 
     sp_pattern = re.compile( """[\.\!\"\s\-\,\']+""", re.M)
-    res = vd( int, {})                                                           
+    res = vd( int, {})
     for line in iter(open(unicode_file ) ):
         for word in map( clean(exclude),  
                 map( str.lower, sp_pattern.split(line ))
             ):
             if len(word) > 2 :
                 res += vd(int, { 
-                    word : 1 ,'begin_with' : 
-                        vd(int, { word[0] : 1 }) }
-                )
+                    word : 1 ,
+                    'begin_with' : 
+                        vd(int, { word[0] : 1 }) ,
+                    'has_size' :
+                        vd(int, { len(word) : 1 } )
+                    })
+
     return res
 
 p = Pool()
@@ -47,6 +63,10 @@ result = reduce(vd.__add__,result)
 print "Frequency of words begining with"
 result['begin_with'].tprint()
 result.prune( "begin_with")
+print "Repartition of size words size"
+result['has_size'].tprint()
+result.prune( "has_size")
+
 from itertools import islice
 print "TOP 40 most used words"
 print "\n".join(
