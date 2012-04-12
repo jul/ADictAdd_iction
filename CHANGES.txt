@@ -69,5 +69,7 @@ v 0.6.0
    * inconsistency in logical operations spotted. Change in API planned (0.7.0)
    * how the heck do I force test_suite to be triggered when people install this package and an automated bug tracking trace added to github, plus not installing broken packages ? Python is still way behind perl -eshell -MCPAN behaviour. 
 
-
+v 1.0.0
+    * BUG 12 fixed
+    * XOR bug remaining
 

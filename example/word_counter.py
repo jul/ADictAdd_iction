@@ -22,14 +22,11 @@ if cmd_folder not in sys.path:
    sys.path.insert(0, cmd_folder)
 
 
-from multiprocessing import Pool
 import string
 import re
 #from codecs import open as open
 
 from vector_dict.VectorDict import VectorDict as vd
-FILES = [ "../dorian_splited.aa",  "../dorian_splited.ab",
-        "../dorian_splited.ac",  "../dorian_splited.ad" ]
 
 
 def word_count( unicode_file ):
@@ -54,12 +51,10 @@ def word_count( unicode_file ):
                     'has_size' :
                         vd(int, { len(word) : 1 } )
                     })
-
     return res
 
-p = Pool()
-result=p.map(word_count, FILES )
-result = reduce(vd.__add__,result)
+result=word_count("../dorian.txt" )
+#result = reduce(vd.__add__,result)
 print "Frequency of words begining with"
 result['begin_with'].tprint()
 result.prune( "begin_with")

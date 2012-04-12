@@ -169,7 +169,7 @@ def cos( obj1, obj2):
 def tree_from_path( *path,**option ):
     """creating a dict from a path
 
- >>> tree_from_path( 'a', 'b', 'c', 1  ).tprint()
+ >>> tree_from_path( 'a', 'b', 'c', 1, defaultdict_factory = int  ).tprint()
  {
      a : {
          b : {
