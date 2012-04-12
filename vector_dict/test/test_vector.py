@@ -377,7 +377,7 @@ class TestVectorDict(unittest.TestCase):
 
         )
     def test_bug_boolean_not_commutative(self):
-        """bug #9: a xor b != ! ( a xand b )"""
+        """bug #11: a xor b != ! ( a xand b )"""
         a = VectorDict( lambda : False, 
             dict( tt = True, tf = True, ft=False, ff = False, not_in_b=False) 
         )
