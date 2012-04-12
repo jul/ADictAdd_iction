@@ -9,11 +9,11 @@ from  Clause import Clause, is_leaf, is_container, is_function
 #WTFPL
 
 __all__ = ['cos', 'dot',  'iter_object' , 'tree_from_path', 'Path',
-    'flattening', 'can_be_walked', 'Element']
+    'flattening', 'can_be_walked', 'Element', 'flatten_generator']
 
 
 
-def convert_tree(a_tree):
+def convert_tree(a_tree, defaultdict_factory = int):
     """
     convert from any other nested object to a VectorDict 
     espaecially usefull for constructing a vector dict from 
@@ -32,12 +32,39 @@ def convert_tree(a_tree):
      },
  }
 
+    ** BUG : if empty dict is a leaf, default_factory is not applied**
+    workaround :you can specify Krut as leaves explicilty 
+    let's define 3 domain : 
+    
+    * root is defaulting to str
+    * a is defaulting to list
+    * b defaulting to int
+
+ >>> from vector_dict.VectorDict import VectorDict as krut
+ >>> from vector_dict.VectorDict import converter as kruter
+ >>> a = kruter( { 'a' : Krut( list, {} ),'b' : Krut(int, {}) }, str )  
+ >>> a['b']['e'] += 1 
+ >>> a['a']['c'] += [ 3 ]
+ >>> a['d'] += "toto"
+ >>> a.tprint()
+ {
+     'a' : {
+         'c' : [3],
+     },
+     'b' : {
+         'e' : 1,
+     },
+     'd' : 'toto',
+ }
 
     """
     a_vector_dict = VectorDict()
 
     for e in iter_object_nl(a_tree, flatten = True):
-        a_vector_dict += tree_from_path( *e )
+        a_vector_dict += tree_from_path( 
+            *e,
+            **dict(defaultdict_factory = defaultdict_factory)
+            )
     return a_vector_dict
 
 Element = namedtuple('Element' , "path value")
@@ -139,7 +166,7 @@ def cos( obj1, obj2):
 
 
 
-def tree_from_path( *path ):
+def tree_from_path( *path,**option ):
     """creating a dict from a path
 
  >>> tree_from_path( 'a', 'b', 'c', 1  ).tprint()
@@ -152,20 +179,26 @@ def tree_from_path( *path ):
  }
 
     """
+    default_factory = option.get("default_factory", int)
     path_to_key = list(path)
-    root = VectorDict( VectorDict, { path_to_key.pop() : path_to_key.pop()})
+    root = VectorDict( default_factory, { path_to_key.pop() : path_to_key.pop()})
     current = root
     while len(path_to_key):
-        current = VectorDict( VectorDict, { path_to_key.pop() : current})
+        current = VectorDict( default_factory, { path_to_key.pop() : current})
     return current
 
 def can_be_walked(stuff):
     """tells if it is walkable """
-    return isinstance(stuff, list) or hasattr(stuff, "__iter__")
+    return hasattr(stuff, "__iter__")
 
 def is_generator(stuff):
     """tells if it is a generator"""
-    return isinstance(stuff, types.GeneratorType)
+    return all( 
+        map( 
+            lambda prop : hasattr( stuff , prop),
+            [ 'next', 'send', 'throw' ]
+        )
+    )
 
 def flattening(a_duck, taxonomy = can_be_walked ):
     """flattening stuff // adapted from python cookbook"""
@@ -285,15 +318,15 @@ class VectorDict(defaultdict):
                             v , types.FunctionType
                         ):
                     # if it is a clause apply it to the targeted tree
-                        match_to_find -= v(self.get(k)) and 1 or 0
+                        match_to_find -= v(self.get(k)) 
                     else:
                     ## it is not a clause
                         val = self.get(k)
                         ## BUG not all leaves are supposed to support -
                         if  is_leaf(val):
-                            match_to_find -=  v == val  and 1 or 0
+                            match_to_find -=  v == val 
                         else:
-                            match_to_find -=  v in val  and 1 or 0
+                            match_to_find -=  v in val
 
                 else:
                     ## the comparison tree goes on
@@ -301,11 +334,11 @@ class VectorDict(defaultdict):
                     if not is_leaf(sub_tree):
                         ## the compared tree goes on 
                         ## we recurse
-                        match_to_find -= sub_tree.match_tree( v ) and 1 or 0
+                        match_to_find -= sub_tree.match_tree( v )
                     else:
                         ### the compared tree is smaller than the comparison 
                         ## tree
-                        match_to_find -= v ==sub_tree and 1 or 0 
+                        match_to_find -= v ==sub_tree
                         #return False
         return 0 == match_to_find
 
