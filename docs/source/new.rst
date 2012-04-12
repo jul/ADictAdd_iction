@@ -1,3 +1,23 @@
+What's new in 1.0.0
+===================
+
+API Change (backward compatible with 0.6.0)
+*******************************************
+
+
+converter() now takes a second argument which defaults to int that is used as
+a default factory for the underlying defaultdict
+
+path_to_tree() has the same change. 
+
+Boolean operations
+******************
+
+These are kept for backward compatibility but not documented anymore. 
+Commutation don't work. Refactoring is needed. 
+
+
+
 What's new in 0.6.0
 ===================
 
