@@ -6,7 +6,6 @@ Manipulating dict of dict as trees with :
 
 * set operations
 * logical operations
-* algebraic behaviour 
 * tree manipulations
 * search operation
 * metrics of similarities
@@ -30,12 +29,6 @@ Set Operations
 
 .. autoclass:: vector_dict.VectorDict.VectorDict
     :members: intersection, symmetric_difference, union, issubset, issuperset
-
-Logical Operations
-******************
-
-.. autoclass:: vector_dict.VectorDict.VectorDict
-    :members: __and__, __or__, __not__
 
 Iterators
 *********
@@ -80,6 +73,10 @@ Selecting item in a tree
 .. literalinclude:: ../../example/test_match.py
 
 
+Word counting with multiprocess and vector dict
+-----------------------------------------------
+
+.. literalinclude:: ../../example/word_counter.py
 
 
 
