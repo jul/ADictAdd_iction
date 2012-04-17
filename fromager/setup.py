@@ -7,7 +7,7 @@ from distutils.core import setup
 #test()
 
 setup(
-        name='fromager',
+        name='pypi-stat',
         version='0.5.0',
         author='Julien Tayon',
         author_email='julien@tayon.net',

@@ -128,6 +128,6 @@ if 'save'  in _action:
         ",".join(options._package)  ,
         "stat.png" ]) 
     )
-if 'plot' in _action:
+if 'show' in _action:
     plt.show()
 
