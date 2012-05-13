@@ -1035,25 +1035,24 @@ values
                 
     def __add__(left1, left2):
         """adder"""
+
         left1_big = len(left1.keys()) > len(left2.keys())
         bigger = left1_big and left1.copy() or left2.copy()
         smaller = left1_big and left2 or left1
         for k, v in smaller.iteritems():
-            if k in bigger.keys():
+            if k in bigger:
                 bigger.__setitem__(k, bigger[k] + v )
             else:
                 bigger.__setitem__(k,  v)
         return bigger
     
     def __iadd__(self, other):
-#        print "self %r" % self
-#        self = self + other
-        #print "other %r" % other
         for k, v in other.iteritems():
-            if k in self.keys():
+            try: 
                 self[k] +=  v
-            else:
-                self.__setitem__(k, v)
-        #print "self %r" % self
+            except TypeError: 
+                self.__setitem__(k,v)
+            except KeyError:
+                self.__setitem__(k,v)
         return self
 
