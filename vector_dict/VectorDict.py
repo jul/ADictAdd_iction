@@ -6,6 +6,7 @@ from collections import Sequence, Mapping
 from math import sqrt
 import types
 from  Clause import Clause, is_leaf, is_container, is_function
+from Operator import Adder,Subber
 #WTFPL
 
 __all__ = ['cos', 'dot',  'iter_object' , 'tree_from_path', 'Path',
@@ -260,7 +261,7 @@ def iter_object(obj, path=(), **opt):
                 x for x in flattening( ( path, obj) ) 
             ] or ( path, obj )
 
-class VectorDict(defaultdict):
+class VectorDict(Adder,Subber,defaultdict):
     """slightly enhanced Dict"""
     def __init__(self, *a , **a_dict ):
         """Constructs like a collections.defaultdict (put sphinx ref)"""
@@ -989,18 +990,6 @@ values
         )
 
 
-    def __sub__(self, other):
-        """subber"""
-        positive = self.copy()
-        negative = other
-        positive -= negative
-        return positive
-
-    def __isub__(self, other):
-        for k,v in other.iteritems() :
-            self[k] = self[k] - v if k in self else -1 * v
-        return self
-
 
     def tformat(self, indent_level = 0, base_indent = 4):
         """pretty printing in a tree like form a la Perl"""
@@ -1030,18 +1019,3 @@ values
     def pprint(self):
         """ pretty printing the VectorDict in flattened vectorish representation"""
         print self.pformat()
-
-    def __add__(left1, left2):
-        """adder"""
-        left1_big = len(left1.keys()) > len(left2.keys())
-        bigger = left1_big and left1.copy() or left2.copy()
-        smaller = left1_big and left2 or left1
-        bigger += smaller
-        return bigger
-
-    def __iadd__(self, other):
-        for k,v in other.items() :
-            self[k] =  v +self[k] if k in self else v
-        return self
-
-
