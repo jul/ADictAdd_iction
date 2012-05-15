@@ -996,11 +996,9 @@ values
         positive -= negative
         return positive
 
-
     def __isub__(self, other):
         for k,v in other.iteritems() :
             self[k] = self[k] - v if k in self else -1 * v
-
         return self
 
 
@@ -1017,33 +1015,33 @@ values
                 toreturn += "%s" % ( isinstance( v, ( str, unicode) ) and ( "'%s'" % v ) or repr(v) )
             toreturn += ',\n'
         toreturn += offset +  '}'
-        return toreturn 
+        return toreturn
 
     def tprint( self, indent_level = 0, base_indent = 4):
         """pretty printing with indentation in tradiotionnal fashion"""
         print self.tformat( indent_level, base_indent )
 
     def pformat(self):
-        return  "\n".join( [ 
+        return  "\n".join( [
                     "%s = %s" % (
                         "->".join( map(unicode, x[0])), 
                        isinstance( x[1], ( str, unicode) ) and ( "'%s'" % x[1] ) or repr(x[1])  
                     ) for x in self.as_vector_iter() ] )
     def pprint(self):
         """ pretty printing the VectorDict in flattened vectorish representation"""
-        print self.pformat() 
-                
+        print self.pformat()
+
     def __add__(left1, left2):
         """adder"""
         left1_big = len(left1.keys()) > len(left2.keys())
-        bigger = not left1_big and left1.copy() or left2.copy()
-        smaller = not left1_big and left2 or left1
+        bigger = left1_big and left1.copy() or left2.copy()
+        smaller = left1_big and left2 or left1
         bigger += smaller
         return bigger
+
     def __iadd__(self, other):
         for k,v in other.items() :
             self[k] =  v +self[k] if k in self else v
-
         return self
 
-    
+
