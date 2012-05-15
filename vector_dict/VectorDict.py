@@ -993,15 +993,15 @@ values
         """subber"""
         positive = self.copy()
         negative = other
-        neg_key = set(negative.keys())
-        pos_key = set(positive.keys())
-        for k, v in negative.iteritems():
-            if k in positive.keys():
-                positive[k] -= v
-            else:
-                positive[k] = -v
+        positive -= negative
         return positive
 
+
+    def __isub__(self, other):
+        for k,v in other.iteritems() :
+            self[k] = self[k] - v if k in self else -1 * v
+
+        return self
 
 
     def tformat(self, indent_level = 0, base_indent = 4):
@@ -1035,24 +1035,15 @@ values
                 
     def __add__(left1, left2):
         """adder"""
-
         left1_big = len(left1.keys()) > len(left2.keys())
-        bigger = left1_big and left1.copy() or left2.copy()
-        smaller = left1_big and left2 or left1
-        for k, v in smaller.iteritems():
-            if k in bigger:
-                bigger.__setitem__(k, bigger[k] + v )
-            else:
-                bigger.__setitem__(k,  v)
+        bigger = not left1_big and left1.copy() or left2.copy()
+        smaller = not left1_big and left2 or left1
+        bigger += smaller
         return bigger
-    
     def __iadd__(self, other):
-        for k, v in other.iteritems():
-            try: 
-                self[k] +=  v
-            except TypeError: 
-                self.__setitem__(k,v)
-            except KeyError:
-                self.__setitem__(k,v)
+        for k,v in other.items() :
+            self[k] =  v +self[k] if k in self else v
+
         return self
 
+    

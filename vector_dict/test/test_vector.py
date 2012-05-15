@@ -44,6 +44,7 @@ class TestVectorDict(unittest.TestCase):
     
     def setUp(self):
         self.easy = VectorDict( int, dict( x=1, y=1, z=0 ) )
+        self.easy_too = VectorDict( int, dict( x=0,y=-2,o=0, ynot = self.easy ))
         self.a_tree = dict( 
             a = 1, 
             b = dict( 
@@ -386,6 +387,21 @@ class TestVectorDict(unittest.TestCase):
         )
         self.assertEqual( ( a & b.__not__() ) | ( a.__not__() & b) , 
             ( ( a | b.__not__() ) & ( a.__not__() | b )).__not__() )
-
+    def test_for_fun(self):
+        """just for fun """
+        a = self.easy
+        b = self.easy_too
+        self.assertEqual(
+            (a-b)*(a+b),
+            a*a - b*b
+            )
+    def test_for_fun2(self):
+        """just for fun """
+        a = self.easy
+        b = self.easy_too
+        self.assertEqual(
+            -(a+b)*(a+b),
+            -(a*a) - 2*a*b -( b*b)
+            )
 if __name__ == '__main__':
     unittest.main(verbosity=2)
