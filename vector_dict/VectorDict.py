@@ -766,7 +766,7 @@ Throw a KeyError excpetion if the path does not led to an element
 
         return (  self.__not__() & other ) | ( other.__not__() & self )
 
-    def intersection( self, other):
+    def intersection(self, other, ignore_value_difference=False):
         """Return all elements common in two different trees
         raise an exception if both leaves are different
 
@@ -791,7 +791,13 @@ Throw a KeyError excpetion if the path does not led to an element
    File "vector_dict/VectorDict.py", line 639, in intersection
      other[k]
  Exception: ('CollisionError', '2 != 1')
- 
+ >>> a.intersection(b, ignore_value_difference=True).tprint()
+ {
+   'a' : {
+      'c' : 2,
+      'b' : 1,
+   },
+ }
 
 """
 
@@ -801,13 +807,14 @@ Throw a KeyError excpetion if the path does not led to an element
         ## and what about sets ? 
         ## try a key or value made of a forzen set
             if  hasattr( self[k], "intersection") :
-                new_dict[k] = (self[k]).intersection( other[k] )
+                new_dict[k] = (self[k]).intersection( other[k], ignore_value_difference )
             else:
-                if self[k] != other[k]:
-                    raise Exception("CollisionError","%s != %s" % (  
-                            self[k] ,
-                            other[k]
-                        ) )
+            	if not ignore_value_difference:
+                    if self[k] != other[k]:
+                        raise Exception("CollisionError","%s != %s" % (  
+                                self[k] ,
+                                other[k]
+                            ) )
                 new_dict[k] = self[k]
         return new_dict or VectorDict()
     
